@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    ports:
+     - 5432:5432
+
+  backend: 
+    build: ./backend
+    container_name: cscc-22-project
+    restart: unless-stopped
+    ports:
+     - ${EXPRESS_PORT}:3000
+    depends_on:
+     - db 
+
+  frontend:
+    build: ./frontend
+    ports:
+     - 5173:5173
+    depends_on:
+     - backend
