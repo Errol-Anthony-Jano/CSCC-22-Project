@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import initModels from '../models/init-models.js';
 import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,3 +21,7 @@ export const testDBConnection = async () => {
     console.error('Unable to connect to the database:', error);
   }
 }
+
+const models = initModels(sequelize);
+
+export default models;
