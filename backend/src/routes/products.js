@@ -3,7 +3,6 @@ import express from "express";
 export const productsRouter = express.Router();
 
 import models from "../config/db.js";
-import products from "../models/products.js";
 
 // -> get all products
 productsRouter.get('/', async (req, res) => {
@@ -32,8 +31,15 @@ productsRouter.delete('/:productId', async (req, res) => {
   })
 })
 
+// -> update existing product
 productsRouter.patch('/:productId', async (req, res) => {
-  const updatedProduct = await models.products.update({
-
+  const updatedProduct = await models.products.update(req.body, {
+    where: {
+      "product_id": req.params.productId,
+    },
+  })
+  res.json({
+    message: `Product ${req.params.productId} updated successfully.`,
+    data: updatedProduct,
   })
 })
