@@ -17,6 +17,7 @@ const startServer = async () => {
 }
 
 import { productsRouter } from "./routes/products.js";
+app.use(express.json())
 app.use("/products", productsRouter);
 
 startServer();
