@@ -11,14 +11,6 @@ export default class products extends Model {
       allowNull: false,
       primaryKey: true
     },
-    business_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'businesses',
-        key: 'business_id'
-      }
-    },
     product_name: {
       type: DataTypes.STRING(255),
       allowNull: false,
@@ -28,7 +20,7 @@ export default class products extends Model {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    product_price_quantity: {
+    product_quantity: {
       type: DataTypes.INTEGER,
       allowNull: false
     }

@@ -11,37 +11,13 @@ export default class transactions extends Model {
       allowNull: false,
       primaryKey: true
     },
-    business_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'businesses',
-        key: 'business_id'
-      }
-    },
     transaction_timestamp: {
       type: DataTypes.DATE,
       allowNull: false
     },
-    product_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'products',
-        key: 'product_id'
-      }
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
+    payment_type: {
+      type: DataTypes.STRING(255),
       allowNull: false
-    },
-    payment_type_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'payment_types',
-        key: 'payment_type_id'
-      }
     }
   }, {
     sequelize,

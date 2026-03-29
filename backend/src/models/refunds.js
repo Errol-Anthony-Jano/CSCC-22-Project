@@ -11,14 +11,6 @@ export default class refunds extends Model {
       allowNull: false,
       primaryKey: true
     },
-    business_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'businesses',
-        key: 'business_id'
-      }
-    },
     transaction_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

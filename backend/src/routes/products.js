@@ -11,15 +11,29 @@ productsRouter.get('/', async (req, res) => {
   res.json(products);
 })
 
-// -> get products from a certain business
-productsRouter.get('/:businessId', async (req, res) => {
-  const businessId = req.params.businessId;
-  const products = await models.products.findAll({
-    where: {
-      business_id: businessId,
-    }
+// -> add new product
+productsRouter.post('/', async (req, res) => {
+  const newProduct = await models.products.create(req.body);
+  res.json({
+    message: "Product added successfully.",
+    data: req.body,
   })
-  res.json(products);
 })
 
-// -> add new product
+// -> delete a product 
+productsRouter.delete('/:productId', async (req, res) => {
+  const deleteProduct = await models.products.destroy({
+    where: {
+      "product_id": req.params.productId,
+    }
+  })
+  res.json({
+    message: `Product ${req.params.productId} deleted successfully.`
+  })
+})
+
+productsRouter.patch('/:productId', async (req, res) => {
+  const updatedProduct = await models.products.update({
+
+  })
+})
