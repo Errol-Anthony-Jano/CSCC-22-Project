@@ -21,8 +21,6 @@ transactionsRouter.post('/', async (req, res) => {
         { transaction: t },
       )
 
-      console.log("First part success, proceeding to second");
-
       const transactionItems = req.body.items.map(async (item) => {
         const transactionItem = await models.transaction_items.create(
           {
