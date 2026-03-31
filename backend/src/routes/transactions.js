@@ -10,4 +10,36 @@ transactionsRouter.get('/', async (req, res) => {
   res.json(transactions);
 })
 
+// -> record transaction
+transactionsRouter.post('/', async (req, res) => {
+  try {
+    const result = await sequelize.transaction(async t => {
+      const newTransaction = await models.transactions.create(
+        {
+          "payment_type": req.body.payment_type,
+        },
+        { transaction: t },
+      )
 
+      console.log("First part success, proceeding to second");
+
+      const transactionItems = req.body.items.map(async (item) => {
+        const transactionItem = await models.transaction_items.create(
+          {
+            "transaction_id": newTransaction.transaction_id,
+            "product_id": item.product_id,
+            "product_quantity": item.product_quantity,
+          },
+          { transaction: t },
+        )
+      })
+
+      return await Promise.all(transactionItems);
+    })
+
+    res.json({ "message": "Success" })
+  }
+  catch (error) {
+    res.json({ "message": error.message, "full_message": error.parent })
+  }
+})
