@@ -3,48 +3,48 @@ const { Model, Sequelize } = _sequelize;
 
 export default class products extends Model {
   static init(sequelize, DataTypes) {
-  return super.init({
-    product_id: {
-      autoIncrement: true,
-      autoIncrementIdentity: true,
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true
-    },
-    product_name: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: "uq_product_name"
-    },
-    product_price: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    product_quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    }
-  }, {
-    sequelize,
-    tableName: 'products',
-    schema: 'public',
-    timestamps: false,
-    indexes: [
-      {
-        name: "pk_product_id",
-        unique: true,
-        fields: [
-          { name: "product_id" },
-        ]
+    return super.init({
+      product_id: {
+        autoIncrement: true,
+        autoIncrementIdentity: true,
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true
       },
-      {
-        name: "uq_product_name",
-        unique: true,
-        fields: [
-          { name: "product_name" },
-        ]
+      product_name: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: "uq_product_name"
       },
-    ]
-  });
+      product_price: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      product_quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      }
+    }, {
+      sequelize,
+      tableName: 'products',
+      schema: 'public',
+      timestamps: false,
+      indexes: [
+        {
+          name: "pk_product_id",
+          unique: true,
+          fields: [
+            { name: "product_id" },
+          ]
+        },
+        {
+          name: "uq_product_name",
+          unique: true,
+          fields: [
+            { name: "product_name" },
+          ]
+        },
+      ]
+    });
   }
 }
