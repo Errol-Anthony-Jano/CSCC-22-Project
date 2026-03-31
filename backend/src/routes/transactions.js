@@ -6,7 +6,12 @@ import models, { sequelize } from "../config/db.js";
 
 // -> get all transactions
 transactionsRouter.get('/', async (req, res) => {
-  const transactions = await models.transactions.findAll();
+  const transactions = await models.transactions.findAll({
+    include: {
+      model: models.transaction_items,
+      as: "transaction_items",
+    }
+  });
   res.json(transactions);
 })
 
