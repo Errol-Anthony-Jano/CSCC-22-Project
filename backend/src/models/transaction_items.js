@@ -23,12 +23,28 @@ export default class transaction_items extends Model {
       product_quantity: {
         type: DataTypes.INTEGER,
         allowNull: false
+      },
+      id: {
+        autoIncrement: true,
+        autoIncrementIdentity: true,
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true
       }
     }, {
       sequelize,
       tableName: 'transaction_items',
       schema: 'public',
-      timestamps: false
+      timestamps: false,
+      indexes: [
+        {
+          name: "pk_transaction_items",
+          unique: true,
+          fields: [
+            { name: "id" },
+          ]
+        },
+      ]
     });
   }
 }
