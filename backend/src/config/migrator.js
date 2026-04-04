@@ -11,3 +11,7 @@ const umzug = new Umzug({
 })
 
 await umzug.up();
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  umzug.runAsCLI();
+}
