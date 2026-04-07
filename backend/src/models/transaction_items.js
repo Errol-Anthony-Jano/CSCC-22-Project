@@ -30,6 +30,11 @@ export default class transaction_items extends Model {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true
+      },
+      is_invalidated: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       }
     }, {
       sequelize,
