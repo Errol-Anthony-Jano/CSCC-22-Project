@@ -26,6 +26,11 @@ export default class refunds extends Model {
       reason: {
         type: DataTypes.STRING(255),
         allowNull: false
+      },
+      is_invalidated: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       }
     }, {
       sequelize,

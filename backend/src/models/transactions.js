@@ -19,6 +19,11 @@ export default class transactions extends Model {
       payment_type: {
         type: DataTypes.STRING(255),
         allowNull: false
+      },
+      is_invalidated: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       }
     }, {
       sequelize,
