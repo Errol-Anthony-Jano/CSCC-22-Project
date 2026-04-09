@@ -1,51 +1,51 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class products extends Model {
+export default class users extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    product_id: {
+    user_id: {
       autoIncrement: true,
       autoIncrementIdentity: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    product_name: {
+    username: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      unique: "uq_product_name"
+      unique: "uq_username"
     },
-    product_unit_price: {
-      type: DataTypes.INTEGER,
+    password: {
+      type: DataTypes.STRING(255),
       allowNull: false
     },
-    product_quantity: {
-      type: DataTypes.INTEGER,
+    is_admin: {
+      type: DataTypes.BOOLEAN,
       allowNull: false
     },
-    is_still_offered: {
+    is_active: {
       type: DataTypes.BOOLEAN,
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'products',
+    tableName: 'users',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "pk_product_id",
+        name: "pk_user_id",
         unique: true,
         fields: [
-          { name: "product_id" },
+          { name: "user_id" },
         ]
       },
       {
-        name: "uq_product_name",
+        name: "uq_username",
         unique: true,
         fields: [
-          { name: "product_name" },
+          { name: "username" },
         ]
       },
     ]
