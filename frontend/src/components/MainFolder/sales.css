@@ -18,7 +18,7 @@
     box-shadow: 3px 5px 10px rgba(94, 89, 89, 0.5);
     border-radius: 8px;
     padding-top: 15px;
-    height: 74vh;
+    height: 71vh;
     
 }
 .container1 h1{
@@ -62,10 +62,10 @@
     background-color: rgba(34, 197, 94, 0.9);
     transition: 0.3s;
 }
-.remove{ /*Kailangan pani balikan */
+.edit{ /*Kailangan pani balikan */
     color: white;
-    background-color: rgba(236, 34, 31, 1);
-    border-color: rgba(192, 15, 12, 1);
+    background-color: rgba(36, 160, 237, 1);
+    border-color: rgba(152, 216, 255, 1);
     border-radius: 8px;
     width: 250px;
     height: 55px;
@@ -82,5 +82,5 @@
     top: 330px;
     left: 9px;
     right: 9px;
-    z-index: 1;
+ 
 }

@@ -5,12 +5,13 @@ export const Navbar = () => {
   return (
     <nav>
       <div className = "header">
+        <div className ="nav">
       <button onClick={() => navigate("/topproduct")}>Top Product</button>
       <button onClick ={()=> navigate("/sales")}>Sales</button>
       <button>Inventory</button>
-      <button onClick ={()=> navigate("/returns")}>Returns</button>
       <button>Activity Log</button>
       <button>Overall reports</button>
+      </div>
        <button onClick ={()=> navigate("/login")}className="logoutbutton">Logout</button>
       </div>
       <hr />

@@ -4,7 +4,6 @@ import Welcomeadmin from "./components/UserManagement-Folder/welcomeadmin";
 import UserManagement from "./components/UserManagement-Folder/usermanagement";
 import TopProduct from "./components/MainFolder/topproduct.jsx";
 import Sales from "./components/MainFolder/sales.jsx";
-import Returns from "./components/MainFolder/returns.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -18,7 +17,6 @@ function App() {
         <Route path="/usermanagement" element={<UserManagement/>}/> 
         <Route path="/topproduct" element={<TopProduct/>}/>
         <Route path="/sales" element={<Sales/>}/>
-        <Route path="/returns" element={<Returns/>}/>
       </Routes>
     </BrowserRouter>
   );

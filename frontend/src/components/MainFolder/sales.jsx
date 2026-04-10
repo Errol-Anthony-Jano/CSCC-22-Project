@@ -1,19 +1,19 @@
 import "./sales.css";
 import {Navbar} from "../MainFolder/Navbar";
 import AddSales from "./addsales";
-import RemoveSales from "./removesales";
+import EditSales from "./editsales";
 import { useState } from "react";
 
 function Sales() {
     const [showaddsales, setshowaddsales] = useState(false);
-    const [showremovesales, setshowremovesales] = useState(false);
+    const [showeditsales, setshoweditsales] = useState(false);
    
      return (
         <div>
             <Navbar/>
             <input type="search" placeholder="Search..." className="search1"/>
             <button className="add" onClick={()=> setshowaddsales(true)}>ADD</button>
-            <button className="remove" onClick={() => setshowremovesales(true)}>REMOVE</button>
+            <button className="edit" onClick={() => setshoweditsales(true)}>EDIT</button>
 
             <h1 className="soldtransactions">Sold Transactions</h1>
              
@@ -27,7 +27,7 @@ function Sales() {
             </div>
           
            {showaddsales && <AddSales onClose={()=> setshowaddsales(false)} />}
-            {showremovesales && <RemoveSales onClose={() => setshowremovesales(false)} />}
+            {showeditsales && <EditSales onClose={() => setshoweditsales(false)} />}
         </div>
           
     )

@@ -1,8 +1,11 @@
 .header{
   display: flex;
-  justify-content: center; 
+  align-items: center;
   gap: 2px;
   padding: 1%
+}
+.nav {
+  margin: 0 auto;
 }
 .header button{
   color: rgba(152, 116, 96, 1);
@@ -21,7 +24,8 @@
   transition: 0.3s;
 }
 .header .logoutbutton{
-  margin-left: 60px;
+  margin-left: -230px;
+  margin-right: 20px;
   color: white;
   background-color: rgba(44, 44, 44, 1);
   border: none;
