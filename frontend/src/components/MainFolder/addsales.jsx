@@ -1,8 +1,6 @@
-import {useState} from "react";
 import "./addsales.css";
 
 function AddSales({ onClose }) {
-    const [paymentMethod,setPaymentMethod] = useState("");
     return (
         <div className="addpopsbg">
             <div className="addpops">
@@ -12,7 +10,7 @@ function AddSales({ onClose }) {
         <h3>DATE & TIME</h3>
         <input type="datetime-local" className="input"/>
         <h3>PAYMENT METHOD:</h3>
-        <select className="paymentmethod" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+        <select className="paymentmethod">
             <option value="">Select Method</option>
             <option value="cash">Cash</option>
              <option value="gcash">Gcash</option>
@@ -20,12 +18,7 @@ function AddSales({ onClose }) {
             <option value="debit">Debit Card</option>
             <option value="cheque">Cheque</option>
         </select>
-        {paymentMethod === "gcash" && ( 
-            <>
-            <h3> REFERENCE NUMBER:</h3>
-            <input type="text" placeholder="Enter Reference Number" className="input" />
-            </>
-      )}
+        
         <h3>REVENUE:</h3>
         <input type="number" placeholder="Enter Price" className="input"/>
 
