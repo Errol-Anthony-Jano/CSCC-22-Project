@@ -18,9 +18,11 @@ const startServer = async () => {
 
 import { productsRouter } from "./routes/products.js";
 import { transactionsRouter } from './routes/transactions.js';
+import { usersRouter } from './routes/users.js';
 
 app.use(express.json())
 app.use("/products", productsRouter);
 app.use("/transactions", transactionsRouter);
+app.use("/users", usersRouter);
 
 startServer();

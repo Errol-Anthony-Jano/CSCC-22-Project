@@ -4,6 +4,7 @@ export const productsRouter = express.Router();
 
 import models from "../config/db.js";
 
+//add error handling
 // -> get all products
 productsRouter.get('/', async (req, res) => {
   const products = await models.products.findAll();
