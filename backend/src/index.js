@@ -1,5 +1,5 @@
 import { testDBConnection } from './config/db.js'
-import { app } from './app.js'
+import app from './app.js'
 const port = 3000
 
 const startServer = async () => {
