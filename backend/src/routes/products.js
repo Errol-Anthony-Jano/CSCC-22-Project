@@ -12,34 +12,38 @@ productsRouter.get('/', async (req, res) => {
 
 // -> add new product
 productsRouter.post('/', async (req, res) => {
-  const newProduct = await models.products.create(req.body);
-  res.json({
-    message: "Product added successfully.",
-    data: req.body,
-  })
+  try {
+    await models.products.create(req.body);
+    res.json({
+      message: "Product added successfully.",
+      data: req.body,
+    })
+  }
+  catch (err) {
+    res.status(400).json({
+      message: "Error adding product.",
+      error: err.message,
+    })
+  }
 })
 
-// -> delete a product 
-productsRouter.delete('/:productId', async (req, res) => {
-  const deleteProduct = await models.products.destroy({
-    where: {
-      "product_id": req.params.productId,
-    }
-  })
-  res.json({
-    message: `Product ${req.params.productId} deleted successfully.`
-  })
-})
-
-// -> update existing product
+// update any of the product details (except for product_id)
 productsRouter.patch('/:productId', async (req, res) => {
-  const updatedProduct = await models.products.update(req.body, {
-    where: {
-      "product_id": req.params.productId,
-    },
-  })
-  res.json({
-    message: `Product ${req.params.productId} updated successfully.`,
-    data: updatedProduct,
-  })
+  try {
+    const productId = req.params.productId;
+    await models.products.update(req.body, {
+      where: {
+        product_id: productId,
+      }
+    })
+    res.json({
+      message: "Product updated successfully.",
+      data: req.body,
+    })
+  } catch (err) {
+    res.status(400).json({
+      message: "Error updating product.",
+      error: err.message,
+    })
+  }
 })
