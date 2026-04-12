@@ -1,8 +1,15 @@
 import express from "express";
-
 export const productsRouter = express.Router();
-
 import models from "../config/db.js";
+import { validateInsertPayload } from "../middleware/productsMiddleware.js";
+import { validatePatchPayload } from "../middleware/productsMiddleware.js";
+
+const productsSchema = {
+  product_name: "string",
+  product_unit_price: "number",
+  product_quantity: "number",
+  is_still_offered: "boolean"
+}
 
 //add error handling
 // -> get all products
@@ -12,7 +19,7 @@ productsRouter.get('/', async (req, res) => {
 })
 
 // -> add new product
-productsRouter.post('/', async (req, res) => {
+productsRouter.post('/', validateInsertPayload(productsSchema), async (req, res) => {
   try {
     await models.products.create(req.body);
     res.json({
@@ -29,7 +36,7 @@ productsRouter.post('/', async (req, res) => {
 })
 
 // update any of the product details (except for product_id)
-productsRouter.patch('/:productId', async (req, res) => {
+productsRouter.patch('/:productId', validatePatchPayload(productsSchema), async (req, res) => {
   try {
     const productId = req.params.productId;
     await models.products.update(req.body, {
