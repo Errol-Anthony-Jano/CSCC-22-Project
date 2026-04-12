@@ -4,6 +4,7 @@ export const transactionsRouter = express.Router();
 
 import models, { sequelize } from "../config/db.js";
 
+//add error handling
 // -> get all transactions
 transactionsRouter.get('/', async (req, res) => {
   const transactions = await models.transactions.findAll({
