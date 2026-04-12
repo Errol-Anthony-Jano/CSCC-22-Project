@@ -1,4 +1,4 @@
-import { containsInvalidKeys, isPayloadComplete, validatePayloadDataTypes, validateValueConstraints} from "./payloadValidator.js";
+import { containsInvalidKeys, isPayloadComplete, validatePayloadDataTypes, validateValueConstraints } from "./payloadValidator.js";
 
 export const validateInsertPayload = (schema) => {
     return (req, res, next) => {
@@ -42,26 +42,13 @@ export const validatePatchPayload = (schema) => {
         }
 
         // check for keys with invalid data types
-        // TODO: Isolate in separate file for reusability
-        for (const key in schema) {
-            if (typeof req.body[key] !== schema[key]) {
-                return res.status(400).json({ message: `Invalid data types provided for field: ${key}.` });
-            }
+        if (!validatePayloadDataTypes(payloadKeys, schemaKeys)) {
+            return res.status(400).json({ message: "Invalid data types of values in payload." });
         }
 
         // check for constraint violations
-        // TODO: Isolate in separate file for reusability
-        for (const key in payloadKeys) {
-            if (typeof req.body[key] == 'number') {
-                if (req.body[key] > Number.MAX_SAFE_INTEGER) {
-                    return res.status(400).json({ message: `Error: integer overflow detected for ${key}: ${req.body[key]}` });
-                }
-            }
-            else if (typeof req.body[key] == 'string') {
-                if (req.body[key].length > MAX_STRING_LENGTH) {
-                    return res.status(400).json({ message: `Error: string length constraint violated by ${key}: ${req.body[key]}` });
-                }
-            }
+        if (!validateValueConstraints(req.body, payloadKeys, schema)) {
+            return res.status(400).json({ message: "Data outside of boundaries." });
         }
     }
 }
