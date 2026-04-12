@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import app from '../app.js';
-import products from '../models/products.js';
 
 describe('Products API', () => {
     //negative path tests
@@ -41,6 +40,71 @@ describe('Products API', () => {
         // expect(res.body.message).toEqual("Error adding product.");
     })
 
+    it('should return an error when adding a product with a product name more than 255 characters', async () => {
+        const weirdProduct = {
+            product_name: "a".repeat(300),
+            product_unit_price: 15000,
+            product_quantity: 100,
+            is_still_offered: true
+        }
+        const res = await request(app).post('/products').send(weirdProduct);
+        expect(res.statusCode).toEqual(400)
+    })
+
+    it('should return an error when adding a product with a numeric value higher than INT limit (2,147,483,647)', async () => {
+        const weirdProduct = {
+            product_name: "Weird Product",
+            product_unit_price: 3000000000,
+            product_quantity: 3000000000,
+            is_still_offered: true
+        }
+        const res = await request(app).post('/products').send(weirdProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when adding a product with 0 as numeric values', async () => {
+        const weirdProduct = {
+            product_name: "Weird Product",
+            product_unit_price: 0,
+            product_quantity: 0,
+            is_still_offered: true,
+        }
+        const res = await request(app).post('/products').send(weirdProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when adding a product with negative numeric values', async () => {
+        const weirdProduct = {
+            product_name: "Weird Product",
+            product_unit_price: -100,
+            product_quantity: -100,
+            is_still_offered: true,
+        }
+        const res = await request(app).post('/products').send(weirdProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when adding an empty product', async () => {
+        const emptyProduct = {}
+        const res = await request(app).post('/products').send(emptyProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    // happy path
+    it('should successfully insert a valid product', async () => {
+        const validProduct = {
+            product_name: "Tarpaulin 7 x 7",
+            product_unit_price: 10000,
+            product_quantity: 100,
+            is_still_offered: true
+        }
+        const res = await request(app).post('/products').send(validProduct);
+        console.log(res.body);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.message).toEqual("Product added successfully.");
+    }, 30000)
+
     // UPDATE
 
     it('should return an error when updating product with invalid data types', async () => {
@@ -53,5 +117,30 @@ describe('Products API', () => {
         const res = await request(app).patch('/products/1').send(invalidUpdate);
         expect(res.statusCode).toEqual(400);
         // expect(res.body.message).toEqual("Invalid data types provided.");
+    })
+
+    it('should return an error when updating a product with empty request', async () => {
+        const emptyUpdate = {}
+        const res = await request(app).patch('/products/1').send(emptyUpdate);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when updating a product with non-existent fields', async () => {
+        const fakeProduct = {
+            pangalan: "Fake product",
+            presyo: 1000,
+            kantidad: 100,
+            ginabaligya_pa: false
+        }
+        const res = await request(app).patch('/products/1').send(fakeProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when updating a non-existent product', async () => {
+        const realProduct = {
+            product_name: "Tarpaulin 9 x 9"
+        }
+        const res = await request(app).patch('/products/999').send(realProduct);
+        expect(res.statusCode).toEqual(400);
     })
 });
