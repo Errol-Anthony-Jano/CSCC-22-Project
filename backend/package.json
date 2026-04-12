@@ -19,5 +19,9 @@
     "sequelize": "^6.37.8",
     "sequelize-auto": "^0.8.8",
     "umzug": "^3.8.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.4"
   }
 }
