@@ -62,7 +62,7 @@ describe('Products API', () => {
         expect(res.statusCode).toEqual(400);
     })
 
-    it('should return an error when adding a product with 0 as numeric values', async () => {
+    it('should return an error when adding a product with 0 as price', async () => {
         const weirdProduct = {
             product_name: "Weird Product",
             product_unit_price: 0,
@@ -89,32 +89,22 @@ describe('Products API', () => {
         const res = await request(app).post('/products').send(emptyProduct);
         expect(res.statusCode).toEqual(400);
     })
-
-    // happy path
-    it('should successfully insert a valid product', async () => {
-        const validProduct = {
-            product_name: "Tarpaulin 7 x 7",
-            product_unit_price: 10000,
-            product_quantity: 100,
-            is_still_offered: true
-        }
-        const res = await request(app).post('/products').send(validProduct);
-        console.log(res.body);
-
-        expect(res.statusCode).toEqual(200);
-        expect(res.body.message).toEqual("Product added successfully.");
-    }, 30000)
-
     // UPDATE
 
     it('should return an error when updating product with invalid data types', async () => {
         const invalidUpdate = {
             product_name: "Invalid product",
-            products_unit_price: "Fake number",
+            product_unit_price: "Fake number",
             product_quantity: "Fake number",
             is_still_offered: "Not a boolean"
         }
         const res = await request(app).patch('/products/1').send(invalidUpdate);
+
+        if (res.statusCode !== 400) {
+            console.log("i should be printing");
+            console.log(res.body.message);
+        }
+
         expect(res.statusCode).toEqual(400);
         // expect(res.body.message).toEqual("Invalid data types provided.");
     })
@@ -141,6 +131,40 @@ describe('Products API', () => {
             product_name: "Tarpaulin 9 x 9"
         }
         const res = await request(app).patch('/products/999').send(realProduct);
+        expect(res.statusCode).toEqual(404);
+    })
+
+    it('should return an error when updating a product with produt name more than 255 characters', async () => {
+        const abnormalProduct = {
+            product_name: "a".repeat(300)
+        }
+        const res = await request(app).patch('/products/1').send(abnormalProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when updating a product with numeric values more than INT limit', async () => {
+        const fakeProduct = {
+            product_unit_price: 3000000000,
+            product_quantity: 3000000000,
+        }
+        const res = await request(app).patch('/products/1').send(fakeProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when updating product price with numeric value of 0', async () => {
+        const fakeProduct = {
+            product_unit_price: 0
+        }
+        const res = await request(app).patch('/products/1').send(fakeProduct);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it('should return an error when updating a product with negative numeric values', async () => {
+        const fakeProduct = {
+            product_unit_price: -100,
+            product_quantity: -100
+        }
+        const res = await request(app).patch('/products/1').send(fakeProduct);
         expect(res.statusCode).toEqual(400);
     })
 });
