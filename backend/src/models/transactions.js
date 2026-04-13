@@ -27,6 +27,11 @@ export default class transactions extends Model {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      default: Sequelize.fn('now')
+    },
     created_by: {
       type: DataTypes.INTEGER,
       allowNull: false,
