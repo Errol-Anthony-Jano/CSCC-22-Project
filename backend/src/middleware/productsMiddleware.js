@@ -25,8 +25,6 @@ export const validateInsertPayload = (schema) => {
         if (!validateValueConstraints(req.body, payloadKeys, schema)) {
             return res.status(400).json({ message: "Data outside boundaries."});
         }
-
-        next();
     }
 }
 
@@ -36,13 +34,17 @@ export const validatePatchPayload = (schema) => {
         const payloadKeys = Object.keys(req.body);
         const schemaKeys = Object.keys(schema);
 
+        if (payloadKeys.length == 0) {
+            return res.status(400).json({ message: `Empty request detected.`});
+        }
+
         // check for invalid keys
         if (!containsInvalidKeys(payloadKeys, schemaKeys)) {
             return res.status(400).json({ message: `Invalid fields detected.` })
         }
 
         // check for keys with invalid data types
-        if (!validatePayloadDataTypes(payloadKeys, schemaKeys)) {
+        if (!validatePayloadDataTypes(req.body, payloadKeys, schema)) {
             return res.status(400).json({ message: "Invalid data types of values in payload." });
         }
 
@@ -50,5 +52,7 @@ export const validatePatchPayload = (schema) => {
         if (!validateValueConstraints(req.body, payloadKeys, schema)) {
             return res.status(400).json({ message: "Data outside of boundaries." });
         }
+
+        next();
     }
 }
