@@ -28,7 +28,10 @@ export const validateValueConstraints = (payload, payloadKeys, schema) => {
         if (typeof payload[key] === 'string' && (payload[key].length > MAX_STRING_LENGTH || payload[key].length == 0)) {
             return false;
         }
-        else if (typeof payload[key] === 'number' && (payload[key] > MAX_SIGNEDINT_VALUE || payload[key] <= 0)) {
+        else if (typeof payload[key] === 'number' && (payload[key] > MAX_SIGNEDINT_VALUE || payload[key] < 0)) {
+            return false;
+        }
+        else if (key === 'product_unit_price' && payload[key] === 0) {
             return false;
         }
     }
