@@ -1,4 +1,4 @@
-import "./confirmation.css";
+import "/confirmation.module.css";
 import { useNavigate } from "react-router-dom";
 function Confirmation({onClose}) {
      const navigate = useNavigate();

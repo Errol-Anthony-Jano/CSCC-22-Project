@@ -1,4 +1,4 @@
-import "./topproduct.css";
+import "./topproduct.module.css";
 import {Navbar} from "../MainFolder/Navbar";
 
 function TopProduct() {

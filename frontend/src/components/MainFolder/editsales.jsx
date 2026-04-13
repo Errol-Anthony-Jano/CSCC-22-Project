@@ -1,5 +1,5 @@
 import {useState} from "react";
-import "./editsales.css";
+import "./editsales.module.css";
 function EditSales({ onClose }) {
   const [paymentMethod, setPaymentMethod] = useState("");
   return (

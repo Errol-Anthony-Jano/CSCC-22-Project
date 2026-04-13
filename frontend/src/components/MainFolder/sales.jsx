@@ -1,4 +1,4 @@
-import "./sales.css";
+import "./sales.module.css";
 import {Navbar} from "../MainFolder/Navbar";
 import AddSales from "./addsales";
 import EditSales from "./editsales";

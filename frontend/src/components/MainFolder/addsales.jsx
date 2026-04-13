@@ -1,4 +1,4 @@
-import "./addsales.css";
+import "./addsales.module.css";
 
 function AddSales({ onClose }) {
     return (
