@@ -5,7 +5,6 @@ export const usersRouter = express.Router();
 
 import models from "../config/db.js";
 
-//add/fix error handling
 //add checking if current user is an admin for adding and deleting
 
 // -> login 
@@ -29,7 +28,7 @@ usersRouter.post('/login', async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if(!isMatch){
-      return res.status(401).json({message: 'wrong password'})
+      return res.status(401).json({message: 'Wrong password'})
     }
 
     res.status(200).json({
@@ -92,7 +91,7 @@ usersRouter.post('/', async (req, res) => {
   }
 })
 
-// -> delete/archive user
+// -> remove(archive) user
 usersRouter.delete('/:user_id', async (req,res) => {
   try{
     const [archivedUsers] = await models.users.update(
