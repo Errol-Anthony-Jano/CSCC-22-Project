@@ -1,8 +1,16 @@
 import express from "express";
-
 export const productsRouter = express.Router();
-
 import models from "../config/db.js";
+import { validateInsertPayload } from "../middleware/productsMiddleware.js";
+import { validatePatchPayload } from "../middleware/productsMiddleware.js";
+import { insertNewProduct, updateExistingProduct } from "../controllers/productsController.js";
+
+const productsSchema = {
+  product_name: "string",
+  product_unit_price: "number",
+  product_quantity: "number",
+  is_still_offered: "boolean"
+}
 
 //add error handling
 // -> get all products
@@ -12,35 +20,7 @@ productsRouter.get('/', async (req, res) => {
 })
 
 // -> add new product
-productsRouter.post('/', async (req, res) => {
-  const newProduct = await models.products.create(req.body);
-  res.json({
-    message: "Product added successfully.",
-    data: req.body,
-  })
-})
+productsRouter.post('/', validateInsertPayload(productsSchema), insertNewProduct)
 
-// -> delete a product 
-productsRouter.delete('/:productId', async (req, res) => {
-  const deleteProduct = await models.products.destroy({
-    where: {
-      "product_id": req.params.productId,
-    }
-  })
-  res.json({
-    message: `Product ${req.params.productId} deleted successfully.`
-  })
-})
-
-// -> update existing product
-productsRouter.patch('/:productId', async (req, res) => {
-  const updatedProduct = await models.products.update(req.body, {
-    where: {
-      "product_id": req.params.productId,
-    },
-  })
-  res.json({
-    message: `Product ${req.params.productId} updated successfully.`,
-    data: updatedProduct,
-  })
-})
+// update any of the product details (except for product_id)
+productsRouter.patch('/:productId', validatePatchPayload(productsSchema), updateExistingProduct);
