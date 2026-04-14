@@ -14,7 +14,7 @@ const usersSchema = {
 const loginSchema = {
   username: "string",
   password: "string",
-  id: "number"
+  user_id: "number"
 }
 
 // -> login 

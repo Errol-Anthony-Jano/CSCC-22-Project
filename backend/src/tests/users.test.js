@@ -1,65 +1,61 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import request from 'supertest';
 import app from '../app.js';
+import models from '../config/db.js';
+import bcrypt from 'bcryptjs';
 
-describe('Users API', () => {
-  //positive
+// Mock db
+vi.mock('../config/db.js', () => ({
+  default: {
+    users: {
+      findOne: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn()
+    }
+  }
+}));
+
+// Mock bcrypt
+vi.mock('bcryptjs', () => ({
+  default: {
+    compare: vi.fn(),
+    hash: vi.fn(),
+    genSalt: vi.fn()
+  }
+}));
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+describe('Users Login', () => {
   // LOGIN
   it('should return 200/ok if valid login', async () => {
+    models.users.findOne.mockResolvedValue({
+      user_id: 1,
+      username: "user-admin",
+      password: "hashedPassword",
+      is_admin: true,
+      is_active: true
+    });
+
+    bcrypt.compare.mockResolvedValue(true);
+
     const validUser = {
         username: "user-admin",
         password: "Admin123!",
-        id: 1
+        user_id: 1
     };
+
     const res = await request(app).post('/users/login').send(validUser);
     expect(res.statusCode).toEqual(200);
     //expect(res.body.message).toEqual("Login successful");
   });
-  
-  //ADD USER
-  it('should return 200/ok if successfully added admin user', async () => {
-    const validUser = {
-        username: "username",
-        password: "hashedPassword",
-        confirmPassword: "hashedPassword",
-        role: "admin"
-    };
-    const res = await request(app).post('/users').send(validUser);
-    expect(res.statusCode).toEqual(200);
-    //expect(res.body.message).toEqual("Adding user successful");
-  });
-  
-  it('should return 200/ok if successfully added employee user', async () => {
-    const validUser = {
-      username: "username2",
-      password: "hashedPassword",
-      confirmPassword: "hashedPassword",
-      role: "employee"
-    };
-    const res = await request(app).post('/users/2').send(validUser);
-    expect(res.statusCode).toEqual(200);
-    //expect(res.body.message).toEqual("User removed");
-  });
-  //ARCHIVE
-  it('should return 200/ok if user is successfully removed user', async () => {
-    const validUser = {
-        username: "username2",
-        password: "hashedPassword",
-        is_admin: false,
-        is_active: true
-    };
-    const res = await request(app).post('/users/2').send(validUser);
-    expect(res.statusCode).toEqual(200);
-    //expect(res.body.message).toEqual("User removed");
-  });
 
-  //negative
-  //LOGIN
-    //missing fields
+  //missing fields
     it('should return an error when logging in with missing fields', async () => {
       const invalidUser = {
-          username: "username",
-          password: "hashedPassword",
+          username: "user-admin",
       };
       const res = await request(app).post('/users/login').send(invalidUser);
       expect(res.statusCode).toEqual(400);
@@ -68,9 +64,9 @@ describe('Users API', () => {
     //invalid input
     it('should return an error when logging in with invalid input', async () => {
       const invalidUser = {
-          username: "username",
-          password: "hashedPassword",
-          id: "not a number"
+          username: "user-admin",
+          password: "Admin123!",
+          user_id: "not a number"
       };
       const res = await request(app).post('/users/login').send(invalidUser);
       expect(res.statusCode).toEqual(400);
@@ -78,56 +74,91 @@ describe('Users API', () => {
     });
     //wrong password
     it('should return an error when logging in with a wrong password', async () => {
+        models.users.findOne.mockResolvedValue({
+        user_id: 1,
+        username: "user-admin",
+        password: "hashedPassword",
+        is_admin: true,
+        is_active: true
+      });
+
+      bcrypt.compare.mockResolvedValue(false);
+
       const invalidUser = {
-          username: "username",
+          username: "user-admin",
           password: "NotMyPassword",
-          id: 1
+          user_id: 1
       };
+
       const res = await request(app).post('/users/login').send(invalidUser);
-      expect(res.statusCode).toEqual(400);
+      expect(res.statusCode).toEqual(401);
       //expect(res.body.message).toEqual("");
     });
     //user not found (inactive and not existing)
-    it('should return an error when logging in an inactive account', async () => {
+    it('should return an error when logging in a not found or inactive account', async () => {
+      models.users.findOne.mockResolvedValue(null);
       const invalidUser = {
-          username: "inactiveUser",
-          password: "hashedPassword",
-          id: 3
+          username: "user-admin",
+          password: "Admin123!",
+          user_id: 1
       };
       const res = await request(app).post('/users/login').send(invalidUser);
-      expect(res.statusCode).toEqual(400);
+      expect(res.statusCode).toEqual(404);
       //expect(res.body.message).toEqual("");
     });
-    it('should return an error when logging in a non-existent account', async () => {
-      const invalidUser = {
-          username: "inactiveUser",
-          password: "hashedPassword",
-          id: 3
-      };
-      const res = await request(app).post('/users/login').send(invalidUser);
-      expect(res.statusCode).toEqual(400);
-      //expect(res.body.message).toEqual("");
-    });
-    //wrong user id
-    it('should return an error when logging in with a wrong id', async () => {
-      const invalidUser = {
-          username: "username",
-          password: "hashedPassword",
-          id: 24
-      };
-      const res = await request(app).post('/users/login').send(invalidUser);
-      expect(res.statusCode).toEqual(400);
-      //expect(res.body.message).toEqual("");
+})
+
+describe('Add User', () => {
+  //ADD USER
+  it('should return 201/created if successfully added user(admin)', async () => {
+    models.users.findOne.mockResolvedValue(null);
+
+    bcrypt.genSalt.mockResolvedValue("salt");
+    bcrypt.hash.mockResolvedValue("hashedPassword");
+
+    models.users.create.mockResolvedValue({
+      user_id: 2,
+      username: "newuser",
+      is_admin: true
     });
 
-  //ADD
-    //missing fields
+    const validUser = {
+        username: "newuser",
+        password: "password123",
+        confirmPassword: "password123",
+        role: "admin"
+    };
+    const res = await request(app).post('/users').send(validUser);
+    expect(res.statusCode).toEqual(201);
+    //expect(res.body.message).toEqual("Adding user successful");
+  });
+  
+  it('should return 201/created if successfully added user(employee)', async () => {
+    models.users.findOne.mockResolvedValue(null);
+
+    bcrypt.genSalt.mockResolvedValue("salt");
+    bcrypt.hash.mockResolvedValue("hashedPassword");
+
+    models.users.create.mockResolvedValue({
+      user_id: 2,
+      username: "newuser",
+      is_admin: false
+    });
+
+    const validUser = {
+        username: "newuser",
+        password: "password123",
+        confirmPassword: "password123",
+        role: "employee"
+    };
+    const res = await request(app).post('/users').send(validUser);
+    expect(res.statusCode).toEqual(201);
+    //expect(res.body.message).toEqual("Adding user successful");
+  });
+
+  //missing fields
     it('should return an error when adding user with missing fields', async () => {
-      const invalidUser = {
-        username: "username",
-        password: "hashedPassword",
-        confirmPassword: "hashedPassword",
-      };
+      const invalidUser = { username: "username"};
       const res = await request(app).post('/users').send(invalidUser);
       expect(res.statusCode).toEqual(400);
       //expect(res.body.message).toEqual("");
@@ -135,10 +166,10 @@ describe('Users API', () => {
     //invalid input
     it('should return an error when adding user with invalid input', async () => {
       const invalidUser = {
-        username: "username",
-        password: "hashedPassword",
-        confirmPassword: "hashedPassword",
-        role: 1
+        username: "user",
+        password: "password123",
+        confirmPassword: "password123",
+        role: 123
       };
       const res = await request(app).post('/users').send(invalidUser);
       expect(res.statusCode).toEqual(400);
@@ -160,9 +191,9 @@ describe('Users API', () => {
     it('should return an error when adding user with an invalid role', async () => {
       const invalidUser = {
         username: "username",
-        password: "pass",
-        confirmPassword: "pass",
-        role: "admin"
+        password: "password123",
+        confirmPassword: "password123",
+        role: "user"
       };
       const res = await request(app).post('/users').send(invalidUser);
       expect(res.statusCode).toEqual(400);
@@ -182,27 +213,37 @@ describe('Users API', () => {
     });
     //username already exists
     it('should return an error when adding an existing user', async () => {
+      models.users.findOne.mockResolvedValue({
+        username: "existingUser"
+      });
+
       const invalidUser = {
-        username: "username",
+        username: "existingUser",
         password: "password123",
         confirmPassword: "password123",
         role: "admin"
       };
       const res = await request(app).post('/users').send(invalidUser);
-      expect(res.statusCode).toEqual(400);
+      expect(res.statusCode).toEqual(409);
       //expect(res.body.message).toEqual("");
     });
+})
 
+describe('Archive Users', () => {
   //ARCHIVE
+  it('should return 200/ok if successfully removed user', async () => {
+    models.users.update.mockResolvedValue([1]);
+
+    const res = await request(app).delete('/users/2');
+    expect(res.statusCode).toEqual(200);
+    //expect(res.body.message).toEqual("User removed");
+  });
+
     //user not found
-    it('should return an error when adding user with mismatching passwords', async () => {
-      const invalidUser = {
-        username: "username23",
-        password: "password123",
-      };
-      const res = await request(app).post('/users/24').send(invalidUser);
-      expect(res.statusCode).toEqual(400);
+    it('should return an error when removing a non-existent user', async () => {
+      models.users.update.mockResolvedValue([0]);
+      const res = await request(app).delete('/users/24');
+      expect(res.statusCode).toEqual(404);
       //expect(res.body.message).toEqual("");
     });
-
 })
