@@ -99,12 +99,6 @@ describe('Products API', () => {
             is_still_offered: "Not a boolean"
         }
         const res = await request(app).patch('/products/1').send(invalidUpdate);
-
-        if (res.statusCode !== 400) {
-            console.log("i should be printing");
-            console.log(res.body.message);
-        }
-
         expect(res.statusCode).toEqual(400);
         // expect(res.body.message).toEqual("Invalid data types provided.");
     })
