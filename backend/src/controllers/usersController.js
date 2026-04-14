@@ -43,6 +43,11 @@ export const addUser = async (req, res) => {
       return res.status(400).json({error: 'Passwords do not match'})
     }
 
+    const isAdmin = (role.toLowerCase() === "admin")? true: false;
+    if (!isAdmin && !(role.toLowerCase() === "employee")){
+      return res.status(400).json({error: 'Invalid role'})
+    }
+
     const existingUser = await models.users.findOne({
       where: {
         username: username,
@@ -52,8 +57,6 @@ export const addUser = async (req, res) => {
     if (existingUser){
       return res.status(409).json({error: 'Username already exists'})
     }
-    
-    const isAdmin = (role.toLowerCase() === "admin")? true: false;
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
