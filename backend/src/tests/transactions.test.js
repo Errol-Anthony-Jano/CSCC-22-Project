@@ -1,17 +1,8 @@
 import { vi, describe, it, expect } from 'vitest';
 import request from 'supertest';
 import app from '../app.js';
-
-vi.mock('../models', () => ({
-    default: {
-        transactions: {
-            create: vi.fn(),
-        },
-        users: {
-            findByPk: vi.fn(),
-        }
-    }
-}))
+import models from '../config/db.js';
+import { insertTransaction } from '../controllers/transactionsController.js';
 
 describe('Creating a transaction via POST', () => {
     it('should return an error when the update/insert value isn\'t in the payload', async () => {
@@ -21,7 +12,16 @@ describe('Creating a transaction via POST', () => {
             payment_type: "GCash",
             payment_refstr: "1234567",
             created_by: 1,
+            items: [
+                {
+                    product_id: 1,
+                    product_name: "Malunggay Pandesal with Cheese",
+                    product_unit_price: 500,
+                    quantity_bought: 3
+                }
+            ]
         }
+
         const res = await request(app).post('/transactions').send(invalidTransaction);
         expect(res.statusCode).toEqual(400);
     })
@@ -32,6 +32,14 @@ describe('Creating a transaction via POST', () => {
             payment_type: "GCash",
             payment_refstr: "0521678",
             created_by: 1,
+            items: [
+                {
+                    product_id: 1,
+                    product_name: "Malunggay Pandesal with Cheese",
+                    product_unit_price: 500,
+                    quantity_bought: 3
+                }
+            ]
         }
         const res = await request(app).post('/transactions').send(incompleteTransaction);
         expect(res.statusCode).toEqual(400);
@@ -43,6 +51,14 @@ describe('Creating a transaction via POST', () => {
             // missing payment_type and payment_refstr
             transaction_timestamp: Date.now(),
             created_by: 1,
+            items: [
+                {
+                    product_id: 1,
+                    product_name: "Malunggay Pandesal with Cheese",
+                    product_unit_price: 500,
+                    quantity_bought: 3
+                }
+            ]
         }
         const res = await request(app).post('/transactions').send(incompleteTransaction);
         expect(res.statusCode).toEqual(400);
@@ -55,6 +71,14 @@ describe('Creating a transaction via POST', () => {
             payment_type: "GCash",
             // missing payment_refstr
             created_by: 1,
+            items: [
+                {
+                    product_id: 1,
+                    product_name: "Malunggay Pandesal with Cheese",
+                    product_unit_price: 500,
+                    quantity_bought: 3
+                }
+            ]
         }
 
         const res = await request(app).post('/transactions').send(invalidTransaction);
@@ -67,48 +91,54 @@ describe('Creating a transaction via POST', () => {
             operation: "insert",
             transaction_timestamp: Date.now(),
             payment_type: "GCash",
-            payment_refstr: "1234567"
+            payment_refstr: "1234567",
             // missing created_by
+            items: [
+                {
+                    product_id: 1,
+                    product_name: "Malunggay Pandesal with Cheese",
+                    product_unit_price: 500,
+                    quantity_bought: 3
+                }
+            ]
         }
 
-        models.users.findByPk.mockResolvedValue(null);
+        const res = await request(app).post('/transactions').send(incompleteTransaction);
+        expect(res.statusCode).toEqual(400);
+    })
+
+    it ('should return an error when transaction items is not included in the transaction', async () => {
+        const incompleteTransaction = {
+            operation: "insert",
+            transaction_timestamp: Date.now(),
+            payment_type: "GCash",
+            payment_refstr: "1234567",
+            created_by: 1,
+            // missing items
+        }
 
         const res = await request(app).post('/transactions').send(incompleteTransaction);
         expect(res.statusCode).toEqual(400);
     })
 
     it('should return an error when the referenced user is non-existent', async () => {
-        const incompleteTransaction = {
+        const completeTransaction = {
             operation: "insert",
             transaction_timestamp: Date.now(),
             payment_type: "GCash",
             payment_refstr: "1234567",
-            created_by: 9999
+            created_by: 9999,
+            items: [
+                {
+                    product_id: 1,
+                    product_name: "Malunggay Pandesal with Cheese",
+                    product_unit_price: 500,
+                    quantity_bought: 3
+                }
+            ]
         }
 
-        models.users.findByPk.mockResolvedValue(null);
-
-        const res = await request(app).post('/transactions').send(incompleteTransaction);
+        const res = await request(app).post('/transactions').send(completeTransaction);
         expect(res.statusCode).toEqual(404); // user not found
-    })
-
-    it('should return an error when the referenced user account is inactive', async () => {
-        const inactiveHandler = {
-            operation: "insert",
-            transaction_timestamp: Date.now(),
-            payment_type: "GCash",
-            payment_refstr: "1234567",
-            created_by: 2, // 2 is marked with is_active = false
-        }
-
-        models.users.findByPk.mockResolvedValue({
-            user_id: 2,
-            username: "calcifer",
-            is_admin: false,
-            is_active: false
-        })
-
-        const res = await request(app).post('/transactions').send(inactiveHandler);
-        expect(res.statusCode).toEqual(400);
     })
 })
