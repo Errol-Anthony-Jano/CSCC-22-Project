@@ -1,4 +1,4 @@
-import "./login.css";
+import styles from "./login.module.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -20,23 +20,23 @@ function Login() {
   };
 
   return (
-  <div className="loginpage">
-    <div className="logincontainer">
-      <h1 className="usernamefont">Username:</h1>
+  <div className={styles.loginpage}>
+    <div className={styles.logincontainer}>
+      <h1 className={styles.usernamefont}>Username:</h1>
       <input 
         type="text" 
         placeholder="Enter Username"
         onChange={(e) => setUsername(e.target.value)}
       />
 
-      <h1 className="useridfont">User ID:</h1>
+      <h1 className={styles.useridfont}>User ID:</h1>
       <input 
         type="text" 
         placeholder="Enter User ID"
         onChange={(e) => setUserid(e.target.value)}
       />
 
-      <h1 className="passwordfont">Password:</h1>
+      <h1 className={styles.passwordfont}>Password:</h1>
       <input 
         type="password" 
         placeholder="Enter your password"
@@ -44,7 +44,7 @@ function Login() {
       />
 
       <br />
-      <button className="loginbutton" onClick={handleLogin}>
+      <button className={styles.loginbutton} onClick={handleLogin}>
         Login
       </button>
     </div>

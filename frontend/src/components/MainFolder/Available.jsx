@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Navbar } from './Navbar';
 import EditAvailable from './editavailable';
 import AddProduct from './addproduct';
-import './Available.module.css';
+import styles from './Available.module.css';
 
 const Available = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,36 +53,36 @@ const Available = () => {
   return (
     <>
       <Navbar />
-      <div className="container">
-        <div className="content-card">
-          <div className="top-bar">
+      <div className={styles.container}>
+        <div className={styles['content-card']}>
+          <div className={styles['top-bar']}>
             <input
               type="text"
               placeholder="Search.."
-              className="search-bar"
+              className={styles['search-bar']}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="add" onClick={openAdd}>ADD</button>
+            <button className={styles.add} onClick={openAdd}>ADD</button>
           </div>
 
-          <div className="header">
+          <div className={styles.header}>
             <h1>Available Product</h1>
           </div>
 
-          <div className="product-grid-wrapper">
-            <div className="product-list">
+          <div className={styles['product-grid-wrapper']}>
+            <div className={styles['product-list']}>
               {filteredProducts.map((product) => (
-                <div key={product.id} className="product-card">
-                  <div className="card-content">
-                    <h3 className="product-name">{product.name}</h3>
-                    <div className="product-details">
-                      <p className="quantity">Quantity: {product.quantity}</p>
-                      <p className="product-id">ID: {product.id}</p>
+                <div key={product.id} className={styles['product-card']}>
+                  <div className={styles['card-content']}>
+                    <h3 className={styles['product-name']}>{product.name}</h3>
+                    <div className={styles['product-details']}>
+                      <p className={styles.quantity}>Quantity: {product.quantity}</p>
+                      <p className={styles['product-id']}>ID: {product.id}</p>
                     </div>
-                    <p className="price">{product.price}</p>
+                    <p className={styles.price}>{product.price}</p>
                   </div>
-                  <button className="edit" onClick={() => openEdit(product)}>Edit</button>
+                  <button className={styles.edit} onClick={() => openEdit(product)}>Edit</button>
                 </div>
               ))}
             </div>

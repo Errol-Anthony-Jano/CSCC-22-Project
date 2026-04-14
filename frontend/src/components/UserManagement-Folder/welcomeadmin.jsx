@@ -1,4 +1,4 @@
-import "./welcomeadmin.css";
+import "./welcomeadmin.module.css";
 import { useNavigate } from "react-router-dom";
 function Welcomeadmin() {
     const navigate = useNavigate();

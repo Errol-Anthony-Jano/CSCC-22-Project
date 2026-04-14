@@ -1,4 +1,4 @@
-import "./removeuserpopup.css";
+import "./removeuserpopup.module.css";
 import Confirmation from "./confirmation";
 import { useState } from "react";
 function RemoveUserPopup({ onClose }) {

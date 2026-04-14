@@ -1,4 +1,4 @@
-import "./usermanagement.css";
+import "./usermanagement.module.css";
 import AddUserPopup from "./adduserpopup";
 import RemoveUserPopup from "./removeuserpopup";
 import { useNavigate } from "react-router-dom";
