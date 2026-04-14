@@ -7,13 +7,17 @@ export default class transactions extends Model {
     transaction_id: {
       autoIncrement: true,
       autoIncrementIdentity: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
     prev_txn_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'transactions',
+        key: 'transaction_id'
+      }
     },
     transaction_timestamp: {
       type: DataTypes.DATE,
