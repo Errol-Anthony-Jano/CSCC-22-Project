@@ -4,6 +4,16 @@ export const transactionsRouter = express.Router();
 
 import models, { sequelize } from "../config/db.js";
 
+const transactionsSchema = {
+  prev_txn_id: "number",
+  transaction_timestamp: "number",
+  payment_type: "string",
+  payment_refstr: "string",
+  created_by: "bigint",
+  voided_at: "number",
+}
+
+//add error handling
 // -> get all transactions
 transactionsRouter.get('/', async (req, res) => {
   const transactions = await models.transactions.findAll({

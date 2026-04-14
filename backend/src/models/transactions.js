@@ -7,13 +7,17 @@ export default class transactions extends Model {
     transaction_id: {
       autoIncrement: true,
       autoIncrementIdentity: true,
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
     prev_txn_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'transactions',
+        key: 'transaction_id'
+      }
     },
     transaction_timestamp: {
       type: DataTypes.DATE,
@@ -26,6 +30,11 @@ export default class transactions extends Model {
     payment_refstr: {
       type: DataTypes.STRING(255),
       allowNull: true
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      default: Sequelize.fn('now')
     },
     created_by: {
       type: DataTypes.INTEGER,
