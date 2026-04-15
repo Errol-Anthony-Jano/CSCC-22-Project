@@ -46,22 +46,6 @@
   box-shadow: 0 0 5px rgba(152, 116, 96, 0.3);
 }
 
-.paymentmethod {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #a86e5c;
-  border-radius: 8px;
-  font-size: 14px;
-  background: white;
-  cursor: pointer;
-}
-
-.paymentmethod:focus {
-  outline: none;
-  border-color: #987460;
-  box-shadow: 0 0 5px rgba(152, 116, 96, 0.3);
-}
-
 .buttonpop {
   background-color: #a86e5c;
   color: white;

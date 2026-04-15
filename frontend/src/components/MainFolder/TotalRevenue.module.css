@@ -6,13 +6,13 @@
 }
 
 
-/* Layout */
+
 .container {
     display: flex;
     height: calc(100vh - 70px);
 }
 
-/* Left Panel */
+
 .left-panel {
     width: 35%;
     background: #d9cfc1;
@@ -42,13 +42,13 @@
     cursor: pointer;
 }
 
-/* Right Panel */
+
 .right-panel {
     width: 65%;
     padding: 40px;
 }
 
-/* Chart Box */
+
 .chart-box {
     height: 200px;
     border: 1px solid #ddd;
@@ -59,12 +59,12 @@
     color: #aaa;
 }
 
-/* Info Section */
+
 .info h2 {
     color: #8b5e3c;
 }
 
-/* Month Select */
+
 .month-select {
     display: flex;
     align-items: center;
@@ -72,7 +72,7 @@
     margin-bottom: 25px;
 }
 
-/* Circular Arrow Button */
+
 .arrow-btn {
     width: 40px;
     height: 40px;
@@ -90,7 +90,7 @@
     background: #eee;
 }
 
-/* Centered Info Items */
+
 .info-item {
     display: flex;
     flex-direction: column;

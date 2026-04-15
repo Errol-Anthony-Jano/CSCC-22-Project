@@ -22,7 +22,7 @@ const TotalRevenue = () => {
           <button className={styles['back-btn']} onClick={handleBack}>Back</button>
         </div>
 
-        {/* Right Panel */}
+        
         <div className={styles['right-panel']}>
          
           <div className={styles['chart-box']}>

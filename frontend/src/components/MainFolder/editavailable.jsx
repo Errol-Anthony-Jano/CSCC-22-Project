@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./editsales.module.css";
+import styles from "./editavailable.module.css";
 
 function EditAvailable({ product, onClose, onSave }) {
   const [quantity, setQuantity] = useState(product?.quantity ?? "");
@@ -23,21 +23,9 @@ function EditAvailable({ product, onClose, onSave }) {
         <h3>PRODUCT:</h3>
         <input type="text" value={product.name} className={styles.input} disabled />
         <h3>QUANTITY</h3>
-        <input
-          type="number"
-          placeholder="Enter Quantity"
-          className={styles.input}
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-        />
+        <input type="number" placeholder="Enter Quantity" className={styles.input} value={quantity} onChange={(e) => setQuantity(e.target.value)} />
         <h3>PRICE</h3>
-        <input
-          type="number"
-          placeholder="Enter Price"
-          className={styles.input}
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
+        <input type="number" placeholder="Enter Price" className={styles.input} value={price} onChange={(e) => setPrice(e.target.value)}/>
 
         <button className={styles.buttonpop} onClick={handleSave}>Save</button>
         <button onClick={onClose} className={styles.buttonpop}>Cancel</button>

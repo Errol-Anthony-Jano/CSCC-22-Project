@@ -1,5 +1,6 @@
+/* editsales.module.css - Simplified */
 
-.addpopsbg {
+.editpopsbg {
   position: fixed;
   top: 0;
   left: 0;
@@ -8,7 +9,7 @@
   background-color: rgba(152, 116, 96, 0.9);
 }
 
-.addpops {
+.editpops {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -22,7 +23,7 @@
   overflow-y: auto;
   color: #4a332d;
   font-size: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .producttitle {
@@ -30,6 +31,13 @@
   font-weight: 500;
   text-align: center;
   margin: 0 0 10px 0;
+}
+
+.message {
+  font-size: 13px;
+  text-align: center;
+  color: black;
+  margin-bottom: 20px;
 }
 
 .input {
@@ -43,7 +51,7 @@
 .input:focus {
   outline: none;
   border-color: #987460;
-  box-shadow: 0 0 5px rgba(152, 116, 96, 0.3);
+  box-shadow: 0 0 5px rgba(152,116,96,0.3);
 }
 
 .paymentmethod {
@@ -52,14 +60,6 @@
   border: 1px solid #a86e5c;
   border-radius: 8px;
   font-size: 14px;
-  background: white;
-  cursor: pointer;
-}
-
-.paymentmethod:focus {
-  outline: none;
-  border-color: #987460;
-  box-shadow: 0 0 5px rgba(152, 116, 96, 0.3);
 }
 
 .buttonpop {

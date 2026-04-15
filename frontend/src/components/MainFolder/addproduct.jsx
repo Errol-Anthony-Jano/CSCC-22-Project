@@ -1,4 +1,4 @@
-import styles from "./addsales.module.css";
+import styles from "./addproduct.module.css";
 
 function AddProduct({ onClose }) {
     return (

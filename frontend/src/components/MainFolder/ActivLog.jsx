@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Navbar } from './Navbar';
 import styles from './ActivLog.module.css';
 
+
+// temporary data for visualization only, pwede na siya i-replace sa actual data nga mag-generate sa backend
 const transactions = [
   { name: 'Wireless Earbuds Pro', datetime: '2026-04-05T10:32:00', qty: 2, type: 'remove' },
   { name: 'USB-C Hub 7-in-1', datetime: '2026-04-04T15:15:00', qty: 1, type: 'add' },

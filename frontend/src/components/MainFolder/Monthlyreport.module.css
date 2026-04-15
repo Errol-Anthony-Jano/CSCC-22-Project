@@ -6,13 +6,12 @@
 }
 
 
-/* Layout */
 .container {
     display: flex;
     height: calc(100vh - 55px);
 }
 
-/* Left Panel */
+
 .left-panel {
     width: 38%;
     background: #f4eedf;
@@ -210,7 +209,7 @@
 }
 
 .revenue-btn {
-    background: #e53935;
+    background: #24A0ED;
     color: white;
     border: none;
     padding: 11px 26px;
@@ -220,7 +219,6 @@
     font-weight: 500;
 }
 
-/* Right Panel */
 .right-panel {
     width: 62%;
     padding: 30px 40px;
@@ -228,7 +226,6 @@
     flex-direction: column;
 }
 
-/* Chart Box */
 .chart-box {
     height: 200px;
     margin-bottom: 28px;
@@ -241,13 +238,13 @@
     height: 100%;
 }
 
-/* Grid lines */
+
 .grid-line {
     stroke: #e8e8e8;
     stroke-width: 1;
 }
 
-/* Chart curve */
+
 .chart-path {
     fill: none;
     stroke: #a8cdd8;
@@ -258,12 +255,9 @@
     fill: #a8cdd8;
 }
 
-/* Info Section */
-.info {
-    flex: 1;
-}
 
-/* Month Select */
+
+
 .month-select {
     display: flex;
     align-items: center;
@@ -277,7 +271,7 @@
     color: #8b5e3c;
 }
 
-/* Circle down arrow button */
+
 .arrow-btn {
     width: 34px;
     height: 34px;
@@ -292,11 +286,13 @@
     flex-shrink: 0;
 }
 
-.arrow-btn:hover {
-    background: #f0f0f0;
+.arrow-btn svg {
+    width: 100%;
+    height: 100%;
 }
 
-/* Info Items */
+
+
 .info-item {
     display: flex;
     align-items: flex-start;
