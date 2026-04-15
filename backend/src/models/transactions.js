@@ -14,10 +14,6 @@ export default class transactions extends Model {
     prev_txn_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      references: {
-        model: 'transactions',
-        key: 'transaction_id'
-      }
     },
     transaction_timestamp: {
       type: DataTypes.DATE,
@@ -52,7 +48,7 @@ export default class transactions extends Model {
     sequelize,
     tableName: 'transactions',
     schema: 'public',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "pk_transaction_id",
