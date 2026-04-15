@@ -5,6 +5,7 @@ export const insertTransaction = async (req, res, next) => {
     try {
         const user = await models.users.findByPk(req.body.created_by);
         if (!user) {
+            await transaction.rollback();
             return res.status(404).json("User not found.");
         }
 
