@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test vitest run --coverage"
+    "test-coverage": "cross-env NODE_ENV=test vitest run --coverage",
+    "test": "cross-env NODE_ENV=test vitest"
   },
   "keywords": [],
   "author": "",

@@ -3,13 +3,13 @@ import models from "../config/db.js";
 export const insertNewProduct = async (req, res) => {
     try {
         await models.products.create(req.body);
-        res.json({
+        return res.json({
             message: "Product added successfully.",
             data: req.body,
         })
     }
     catch (err) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Error adding product.",
             error: err.message,
         })
