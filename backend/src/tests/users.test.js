@@ -29,7 +29,7 @@ afterEach(() => {
 });
 
 describe('Users Login', () => {
-  // LOGIN
+// LOGIN
   it('should return 200/ok if valid login', async () => {
     models.users.findOne.mockResolvedValue({
       user_id: 1,
@@ -49,7 +49,12 @@ describe('Users Login', () => {
 
     const res = await request(app).post('/users/login').send(validUser);
     expect(res.statusCode).toEqual(200);
-    //expect(res.body.message).toEqual("Login successful");
+    expect(res.body).toMatchObject({
+      message: "Login successful",
+      user_id: 1,
+      username: "user-admin",
+      is_admin: true
+    });
   });
 
   //missing fields
@@ -109,7 +114,7 @@ describe('Users Login', () => {
 })
 
 describe('Add User', () => {
-  //ADD USER
+//ADD USER
   it('should return 201/created if successfully added user(admin)', async () => {
     models.users.findOne.mockResolvedValue(null);
 
@@ -130,7 +135,12 @@ describe('Add User', () => {
     };
     const res = await request(app).post('/users').send(validUser);
     expect(res.statusCode).toEqual(201);
-    //expect(res.body.message).toEqual("Adding user successful");
+    expect(res.body).toMatchObject({
+      message: "Adding user successful",
+      user_id: 2,
+      username: "newuser",
+      is_admin: true
+    });
   });
   
   it('should return 201/created if successfully added user(employee)', async () => {
@@ -230,13 +240,13 @@ describe('Add User', () => {
 })
 
 describe('Archive Users', () => {
-  //ARCHIVE
+//ARCHIVE
   it('should return 200/ok if successfully removed user', async () => {
     models.users.update.mockResolvedValue([1]);
 
     const res = await request(app).delete('/users/2');
     expect(res.statusCode).toEqual(200);
-    //expect(res.body.message).toEqual("User removed");
+    expect(res.body.message).toEqual("User removed");
   });
 
     //user not found
