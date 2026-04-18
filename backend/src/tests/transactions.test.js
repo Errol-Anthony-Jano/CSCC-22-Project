@@ -4,7 +4,86 @@ import app from '../app.js';
 import models from '../config/db.js';
 import { insertTransaction } from '../controllers/transactionsController.js';
 
+// TODO: Write tests for updating transactions; do in feature/update-transaction branch; branch out of develop
+
 describe('Creating a transaction via POST', () => {
+    it('should return a 200/201 after a successful insert of a transaction with one item', async () => {
+        const validTransaction = {
+            operation: "insert",
+            transaction_timestamp: Date.now(),
+            payment_type: "GCash",
+            payment_refstr: "1234567",
+            created_by: 1,
+            items: [
+                {
+                    product_id: 1,
+                    quantity_bought: 3
+                }
+            ]
+        }
+
+        const res = await request(app).post('/transactions').send(validTransaction);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.message).toEqual("Transaction inserted successfully.");
+    })
+
+    it('should update the product quantities post-transaction correctly', async () => {
+        const product = await models.products.findByPk(1); // retrieve existing product;
+        const productJSON = product.toJSON();
+        const productQuantity = productJSON.product_quantity;
+        const quantityBought = 5;
+
+        const validTransaction = {
+            operation: "insert",
+            transaction_timestamp: Date.now(),
+            payment_type: "GCash",
+            payment_refstr: "1234567",
+            created_by: 1,
+            items: [
+                {
+                    product_id: productJSON.product_id,
+                    quantity_bought: quantityBought,
+                }
+            ]
+        }
+
+        const res = await request(app).post('/transactions').send(validTransaction);
+        console.log(res.message);
+        expect(res.statusCode).toEqual(200);
+
+        const updatedProduct = await models.products.findByPk(1);
+        const updatedProductJSON = updatedProduct.toJSON();
+        expect(updatedProductJSON.product_quantity).toEqual(productQuantity - quantityBought);
+    })
+
+    it('should return a 200 when inserting a transaction with multiple items', async () => {
+        const validTransaction = {
+            operation: "insert",
+            transaction_timestamp: Date.now(),
+            payment_type: "GCash",
+            payment_refstr: "5432109876",
+            created_by: 1,
+            items: [
+                {
+                    product_id: 1,
+                    quantity_bought: 3
+                }, 
+                {
+                    product_id: 2,
+                    quantity_bought: 3,
+                },
+                {
+                    product_id: 3,
+                    quantity_bought: 3
+                }
+            ]
+        }
+
+        const res = await request(app).post('/transactions').send(validTransaction);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.message).toEqual("Transaction inserted successfully.");
+    })
+
     it('should return an error when the update/insert value isn\'t in the payload', async () => {
         const invalidTransaction = {
             // missing operation key
@@ -15,8 +94,6 @@ describe('Creating a transaction via POST', () => {
             items: [
                 {
                     product_id: 1,
-                    product_name: "Malunggay Pandesal with Cheese",
-                    product_unit_price: 500,
                     quantity_bought: 3
                 }
             ]
@@ -35,8 +112,6 @@ describe('Creating a transaction via POST', () => {
             items: [
                 {
                     product_id: 1,
-                    product_name: "Malunggay Pandesal with Cheese",
-                    product_unit_price: 500,
                     quantity_bought: 3
                 }
             ]
@@ -54,8 +129,6 @@ describe('Creating a transaction via POST', () => {
             items: [
                 {
                     product_id: 1,
-                    product_name: "Malunggay Pandesal with Cheese",
-                    product_unit_price: 500,
                     quantity_bought: 3
                 }
             ]
@@ -74,8 +147,6 @@ describe('Creating a transaction via POST', () => {
             items: [
                 {
                     product_id: 1,
-                    product_name: "Malunggay Pandesal with Cheese",
-                    product_unit_price: 500,
                     quantity_bought: 3
                 }
             ]
@@ -96,8 +167,6 @@ describe('Creating a transaction via POST', () => {
             items: [
                 {
                     product_id: 1,
-                    product_name: "Malunggay Pandesal with Cheese",
-                    product_unit_price: 500,
                     quantity_bought: 3
                 }
             ]
@@ -131,8 +200,6 @@ describe('Creating a transaction via POST', () => {
             items: [
                 {
                     product_id: 1,
-                    product_name: "Malunggay Pandesal with Cheese",
-                    product_unit_price: 500,
                     quantity_bought: 3
                 }
             ]
@@ -140,5 +207,43 @@ describe('Creating a transaction via POST', () => {
 
         const res = await request(app).post('/transactions').send(completeTransaction);
         expect(res.statusCode).toEqual(404); // user not found
+    })
+
+    it('should return an error when the referenced product is non-existent', async () => {
+        const completeTransaction = {
+            operation: "insert",
+            transaction_timestamp: Date.now(),
+            payment_type: "GCash",
+            payment_refstr: "1234567",
+            created_by: 1,
+            items: [
+                {
+                    product_id: 999,
+                    quantity_bought: 3
+                }
+            ]
+        }
+
+        const res = await request(app).post('/transactions').send(completeTransaction);
+        expect(res.statusCode).toEqual(404);
+    })
+
+    it('should return an error when the ordered quantity is bigger than available product quantity', async () => {
+        const completeTransaction = {
+            operation: "insert",
+            transaction_timestamp: Date.now(),
+            payment_type: "GCash",
+            payment_refstr: "1234567",
+            created_by: 1,
+            items: [
+                {
+                    product_id: 1,
+                    quantity_bought: 9999,
+                }
+            ]
+        }
+        
+        const res = await request(app).post('/transactions').send(completeTransaction);
+        expect(res.statusCode).toEqual(400);
     })
 })
