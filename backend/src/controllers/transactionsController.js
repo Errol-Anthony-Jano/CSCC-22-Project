@@ -1,24 +1,35 @@
+import { registerConsoleShortcuts } from "vitest/node";
 import models, { sequelize } from "../config/db.js";
+import { where } from "sequelize";
+import { getValidProduct, getValidUser, insertTransactionItem, updateProductQuantity, validatePurchasedAmount } from "../services/transactionService.js";
 
 export const insertTransaction = async (req, res, next) => {
-    const transaction = await sequelize.transaction();
     try {
-        const user = await models.users.findByPk(req.body.created_by);
-        if (!user) {
-            await transaction.rollback();
-            return res.status(404).json("User not found.");
-        }
+        await sequelize.transaction(async t => {
+            const user = await getValidUser(req.body.created_by, t);
 
-        const { items, ...transactionData } = req.body;
+            const { items, ...transactionData } = req.body;
 
-        const newTransaction = await models.transactions.create(transactionData, { transaction })
-        const transactionItems = await models.transactions.bulkCreate(items, { transaction });
+            const txn = await models.transactions.create(transactionData, { transaction: t })
+            const txnJSON = txn.toJSON();
 
-        await transaction.commit();
-        res.status(200).json({ message: "Transaction recorded successfully.", });
+            for (const item of items) {
+                const product = await getValidProduct(item.product_id, t);
+                const productJSON = product.toJSON();
+                await validatePurchasedAmount(item.quantity_bought, product.product_quantity);
+
+                const txnItem = await insertTransactionItem(productJSON, txnJSON, item, t);
+
+                console.log(txnItem);
+                await updateProductQuantity(productJSON, item, t); 
+            }
+        })
+        
+        return res.status(200).json({ 
+            message: "Transaction inserted successfully.",
+        });
     }
     catch (error) {
-        await transaction.rollback();
-        res.status(500).json({ message: "Error inserting transaction." })
+        return res.status(error.status || 500).json({ message: error.message })
     }
 }
