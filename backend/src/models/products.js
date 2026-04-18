@@ -14,7 +14,7 @@ export default class products extends Model {
     product_name: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      unique: "uq_product_name"
+      unique: "products_product_name_key"
     },
     product_unit_price: {
       type: DataTypes.INTEGER,
