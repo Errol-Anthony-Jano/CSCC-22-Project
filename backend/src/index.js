@@ -1,18 +1,21 @@
-import { testDBConnection } from './config/db.js'
-import app from './app.js'
-const port = 3000
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { productsRouter } from "./routes/products.js";
+import { transactionsRouter } from './routes/transactions.js';
+import { usersRouter } from './routes/users.js';
 
-const startServer = async () => {
-  try {
-    await testDBConnection();
-    app.listen(port, () => {
-      console.log(`Example app listening on port ${port}`)
-    })
-  }
-  catch (error) {
-    console.error("Unable to connect to the database: ", error);
-    process.exit(1);  
-  }
-}
+const app = express();
 
-startServer();
+app.use(cors());
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.use("/products", productsRouter);
+app.use("/transactions", transactionsRouter); 
+app.use('/users', usersRouter);
+
+export default app;
