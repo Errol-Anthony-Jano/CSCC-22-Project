@@ -13,3 +13,4 @@ Here is the preferred workflow for integrating changes into the main branch for 
 4. When ready to push, switch to the main branch using git checkout main.
 5. Verify that you are already within the main branch via git branch. When verified, merge the changes of the feature branch you created with the main branch via git merge branch-name.
 6. Push the changes to remote via git pull origin main.
+7. End
