@@ -10,13 +10,40 @@ function RemoveUserPopup({ onClose }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const API_BASE_URL = "http://localhost:3000";
-
+  const API_BASE_URL = "http://localhost:3000"; 
+    
     const handleArchive = async () => {
+        setLoading(true);
+
+        try {
+            console.log("Sending DELETE request to:", `${API_BASE_URL}/users/${userId}`);
+            const response = await axios.delete(`${API_BASE_URL}/users/${userId}`);
+            console.log("Success:", response.data);
+            onClose();
+            return true;
+        } catch (err) {
+            console.error("Full error:", err); 
+            if (err.response) {
+                setError(`Server error: ${err.response.status}`);
+            } else if (err.request) {
+                setError("Cannot connect to backend. Make sure Docker is running.");
+            } else {
+                setError(err.message || "Request failed");
+            }
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleConfirmClick = () => {
+        setError("");
+        
         if (!username && !userId) {
-            setError("Please enter both username and user ID.");
+            setError("Please enter username and user ID.");
             return;
         }
+        
         if (!userId) {
             setError("Please enter user ID.");
             return;
@@ -25,22 +52,8 @@ function RemoveUserPopup({ onClose }) {
             setError("Please enter username.");
             return;
         }
+        setShowConfirm(true);
         
-        setLoading(true);
-        setError("");
-
-        try {
-            console.log("Sending DELETE request..."); 
-            const response = await axios.delete(`${API_BASE_URL}/users/${userId}`);
-            console.log("Success:", response.data);
-            alert("User archived successfully!");
-            onClose();
-        } catch (err) {
-            console.error("Full error:", err); 
-            setError(err.message || "Request failed");
-        } finally {
-            setLoading(false);
-        }
     }
 
     return (
@@ -63,18 +76,36 @@ function RemoveUserPopup({ onClose }) {
                     value={userId} 
                     onChange={(e) => setUserId(e.target.value)}
                 />
-                {error && <div style={{color: "red", margin: "10px 0"}}>{error}</div>}
+                
+                {error && (
+                    <div style={{
+                        color: "red", 
+                        margin: "10px 0", 
+                        padding: "10px", 
+                        backgroundColor: "#ffebee", 
+                        border: "1px solid red", 
+                        borderRadius: "5px",
+                        textAlign: "center"
+                    }}>
+                        {error}
+                    </div>
+                )}
+                
                 <button 
-                    onClick={() => setShowConfirm(true)} 
-                    className={styles.buttonpop} 
-                    disabled={!username || !userId || loading}
+                    onClick={handleConfirmClick} 
+                    className={styles.buttonpop}
                 >
-                    {loading ? "Processing..." : "Confirm"}
+                    Confirm
                 </button>
                 <br />
                 <button onClick={onClose} className={styles.buttonpop}>Cancel</button>
             </div>
-            {showConfirm && <Confirmation onConfirm={handleArchive} onClose={() => setShowConfirm(false)} />}
+            {showConfirm && (
+                <Confirmation 
+                    onConfirm={handleArchive} 
+                    onClose={() => setShowConfirm(false)} 
+                />
+            )}
         </div>
     );
 }
