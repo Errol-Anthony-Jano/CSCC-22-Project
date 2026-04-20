@@ -3,6 +3,17 @@ import request from 'supertest';
 import app from '../app.js';
 
 describe('Products API', () => {
+    it('should insert a product successfully', async () => {
+        const completeProduct = {
+            product_name: "Tarpaulin 5 x 5",
+            product_unit_price: 15000,
+            product_quantity: 100,
+            is_still_offered: true
+        }
+
+        const res = await request(app).post('/products').send(completeProduct);
+        expect(res.statusCode).toEqual(200);
+    })
     //negative path tests
 
     // CREATE
@@ -91,6 +102,38 @@ describe('Products API', () => {
     })
     // UPDATE
 
+    it('should update a product\'s name successfully', async () => {
+        const name = {
+            product_name: "High Quality Tarpaulin 5 x 5"
+        }
+        const res = await request(app).patch('/products/1').send(name);
+        expect(res.statusCode).toEqual(200);
+    })
+
+    it('should update a product\'s unit price successfully', async () => {
+        const price = {
+            product_unit_price: 17500
+        }
+        const res = await request(app).patch('/products/1').send(price);
+        expect(res.statusCode).toEqual(200);
+    })
+
+    it('should update a product\'s quantity successfully', async () => {
+        const quantity = {
+            product_quantity: 17500
+        }
+        const res = await request(app).patch('/products/1').send(quantity);
+        expect(res.statusCode).toEqual(200);
+    })
+
+    it('should flag a product as not offered successfully', async () => {
+        const status = {
+            is_still_offered: false,
+        }
+        const res = await request(app).patch('/products/1').send(status);
+        expect(res.statusCode).toEqual(200);
+    })
+
     it('should return an error when updating product with invalid data types', async () => {
         const invalidUpdate = {
             product_name: "Invalid product",
@@ -99,12 +142,6 @@ describe('Products API', () => {
             is_still_offered: "Not a boolean"
         }
         const res = await request(app).patch('/products/1').send(invalidUpdate);
-
-        if (res.statusCode !== 400) {
-            console.log("i should be printing");
-            console.log(res.body.message);
-        }
-
         expect(res.statusCode).toEqual(400);
         // expect(res.body.message).toEqual("Invalid data types provided.");
     })

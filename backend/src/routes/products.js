@@ -12,7 +12,6 @@ const productsSchema = {
   is_still_offered: "boolean"
 }
 
-//add error handling
 // -> get all products
 productsRouter.get('/', async (req, res) => {
   const products = await models.products.findAll();

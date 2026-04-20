@@ -25,6 +25,8 @@ export const validateInsertPayload = (schema) => {
         if (!validateValueConstraints(req.body, payloadKeys, schema)) {
             return res.status(400).json({ message: "Data outside boundaries."});
         }
+
+        next();
     }
 }
 

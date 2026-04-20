@@ -2,7 +2,14 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     test: {
+        threads: false,
+        isolate: true,
+        fileParallelism: false,
+        setupFiles: ['src/tests/setup.js'],
         environment: 'node',
+        env: {
+            NODE_ENV: "test"
+        },
         globals: true,
         testTimeout: 10000,
         hookTimeout: 20000,
@@ -23,6 +30,6 @@ export default defineConfig({
                 branches: 75,
                 statements: 80
             }
-        }
+        },
     }
 })
