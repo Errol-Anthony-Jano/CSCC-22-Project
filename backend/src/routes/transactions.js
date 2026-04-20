@@ -37,4 +37,16 @@ transactionsRouter.get('/', async (req, res) => {
 })
 
 // -> record transaction
-transactionsRouter.post('/', validateTransaction(transactionsSchema), insertTransaction);
+transactionsRouter.post('/', validateTransaction(transactionsSchema), async (req, res, next) => {
+  try {
+    await sequelize.transaction(async t => {
+      const txnPayload = await insertTransaction(req.body, t);
+      if (txnPayload) {
+        return res.status(201).json({ message: "Product inserted successfully." });
+      }
+    })
+  }
+  catch (error) {
+    return res.status(error.status || 500).statusMessage({ message: error.message });
+  }
+})
