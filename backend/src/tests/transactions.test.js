@@ -23,7 +23,7 @@ describe('Creating a transaction via POST', () => {
         }
 
         const res = await request(app).post('/transactions').send(validTransaction);
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
         expect(res.body.message).toEqual("Transaction inserted successfully.");
     })
 
@@ -49,7 +49,7 @@ describe('Creating a transaction via POST', () => {
 
         const res = await request(app).post('/transactions').send(validTransaction);
         console.log(res.message);
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
 
         const updatedProduct = await models.products.findByPk(1);
         const updatedProductJSON = updatedProduct.toJSON();
@@ -80,7 +80,7 @@ describe('Creating a transaction via POST', () => {
         }
 
         const res = await request(app).post('/transactions').send(validTransaction);
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
         expect(res.body.message).toEqual("Transaction inserted successfully.");
     })
 
