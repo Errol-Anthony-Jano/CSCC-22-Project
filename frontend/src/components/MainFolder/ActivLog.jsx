@@ -2,8 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Navbar } from './Navbar';
 import styles from './ActivLog.module.css';
 
-
-// temporary data for visualization only, pwede na siya i-replace sa actual data nga mag-generate sa backend
 const transactions = [
   { name: 'Wireless Earbuds Pro', datetime: '2026-04-05T10:32:00', qty: 2, type: 'remove' },
   { name: 'USB-C Hub 7-in-1', datetime: '2026-04-04T15:15:00', qty: 1, type: 'add' },
@@ -32,47 +30,45 @@ const ActivLog = () => {
     );
   };
 
-  const activityLabel = (type) => { const labels = { sale: 'Remove', restock: 'Add' }; return labels[type] || type;};
+  const activityLabel = (type) => {
+    const map = { remove: 'Remove', add: 'Add', sale: 'Sale', restock: 'Restock' };
+    return map[type] || type;
+  };
 
   const filteredTransactions = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return query ? transactions.filter((tx) =>
-          tx.name.toLowerCase().includes(query) ||
-          tx.type.toLowerCase().includes(query) ||
-          activityLabel(tx.type).toLowerCase().includes(query)
-        )
-      : transactions;
+    const q = searchQuery.trim().toLowerCase();
+    return q ? transactions.filter(tx =>
+      tx.name.toLowerCase().includes(q) || tx.type.toLowerCase().includes(q)
+    ) : transactions;
   }, [searchQuery]);
-
-  const resultNote = searchQuery
-    ? `${filteredTransactions.length} result${filteredTransactions.length !== 1 ? 's' : ''} found`
-    : '';
 
   return (
     <>
       <Navbar />
-      <input
-        type="search"
-        placeholder="Search..."
-        className={styles.search1}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-
-      <section id="sales" className={styles.page}>
-        <div className={styles.actions}>
+      <section className={styles.page}>
+        <div className={styles.topBar}>
           <div className={styles['center-title']}>
             <h2 className={styles.title}>Activity Log</h2>
-            <p className={styles['result-note']}>{resultNote}</p>
+            {searchQuery && (
+              <p className={styles['result-note']}>
+                {filteredTransactions.length} result{filteredTransactions.length !== 1 ? 's' : ''} found
+              </p>
+            )}
           </div>
+          <input
+            type="search"
+            placeholder="Search..."
+            className={styles.search1}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-
         <div className={styles['table-container']}>
           <table>
             <thead>
               <tr>
                 <th>Product</th>
-                <th>Date&time</th>
+                <th>Date & Time</th>
                 <th>Quantity</th>
                 <th>Activity</th>
               </tr>
@@ -83,19 +79,14 @@ const ActivLog = () => {
                   <td colSpan="4">No transactions found.</td>
                 </tr>
               ) : (
-                filteredTransactions.map((tx, index) => {
-                  const qtyDisplay = tx.type === 'adjust'
-                    ? (tx.qty > 0 ? '+' + tx.qty : String(tx.qty))
-                    : tx.qty;
-                  return (
-                    <tr key={index}>
-                      <td><span className={styles.star}>&#9734;</span> {tx.name}</td>
-                      <td>{formatDateTime(tx.datetime)}</td>
-                      <td>{qtyDisplay}</td>
-                      <td>{activityLabel(tx.type)}</td>
-                    </tr>
-                  );
-                })
+                filteredTransactions.map((tx, i) => (
+                  <tr key={i}>
+                    <td><span className={styles.star}>★</span> {tx.name}</td>
+                    <td>{formatDateTime(tx.datetime)}</td>
+                    <td>{tx.qty}</td>
+                    <td>{activityLabel(tx.type)}</td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

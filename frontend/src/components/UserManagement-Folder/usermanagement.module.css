@@ -1,124 +1,128 @@
-.usermantitle1 {
-  margin-top: 30px;
-  color: rgba(152, 116, 96, 1);
-  text-align: center;
-  font-size: 55px;
-  width: 100%;
+/* User Management */
+.page {
+  min-height: 100vh;
+  background: #0d0d14;
+  animation: pageEntry 0.5s cubic-bezier(0.34,1.1,0.64,1) both;
 }
-.line1{
-    border: 1px solid rgba(168, 110, 92, 1);
-    position: absolute;
-    top: 140px;
-    left: 1px;
-    right: 1px;    
+@keyframes pageEntry {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.header .backbutton {
-    color: rgb(255, 255, 255);
-    background-color: rgba(44, 44, 44, 1);
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    left: 80px;
-    top: 78px;
-    width: 250px;
-    height: 45px;
-  
-    
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 36px 0;
 }
-.header .backbutton:hover {
-    background-color: rgba(68, 66, 66, 0.9);
-    transition: 0.3s;
+
+.usermantitle1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #f5f3ff;
+  letter-spacing: -0.4px;
+}
+
+.backbutton {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 9px;
+  border: 1.5px solid rgba(167,139,250,0.2);
+  background: rgba(255,255,255,0.04);
+  color: rgba(196,181,253,0.7);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.backbutton:hover { border-color: #a78bfa; color: #a78bfa; }
+
+.divider {
+  border: none;
+  border-top: 1px solid rgba(167,139,250,0.1);
+  margin: 20px 36px 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 36px;
+  flex-wrap: wrap;
+}
+
+.adduserbutton, .removeuserbutton {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 9px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
 }
 .adduserbutton {
-    color: white;
-    background-color: rgba(34, 197, 94, 1);
-    box-shadow: 8px 12px 5px rgba(119, 116, 116, 0.479);
-    border: none;
-    border-radius: 101px;
-    width: 250px;
-    height: 55px;
-    font-size: 16px;
-    cursor: pointer;
-    position: absolute;
-    top: 190px;
-    left: 70px;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
 }
-.adduserbutton:hover {
-    background-color: rgba(40, 231, 110, 0.9);
-    transition: 0.3s;
-}
-.removeuserbutton {
-    color: white;
-    background-color: rgba(239, 68, 68, 1);
-    box-shadow: 8px 12px 5px rgba(119, 116, 116, 0.479);
-    border: none;
-    border-radius: 101px;
-    width: 250px;
-    height: 55px;
-    font-size: 16px;
-    cursor: pointer;
-    position: absolute;
-    top: 190px;
-    right: 70px;
-}
-.removeuserbutton:hover {
-    background-color: rgba(253, 97, 97, 0.9);
-    transition: 0.3s;
-}
-.recent {
-    color: rgb(255, 255, 255);
-    font-size: 24px;
-    font-weight: 100;
-    background-color: rgba(152, 116, 96, 0.9);
-    width: 350px;
-    height: 30px;
-    padding: 10px;
-    border-radius: 9999px;
-    position: absolute;
-    text-align: center;
-    top: 234px;
-    left: 50%;
-    transform: translate(-50%);
-    
-}
-.search {
-    width: 250px;
-    height: 40px;
-    border-radius: 200px;
-    border: 1px solid rgba(168, 110, 92, 1);
-    padding: 20px; 
-    position: relative;
-    left: 100px;
-    top: 150px;
-}
-.table{
-   display: flex;
-    overflow-y: auto;  /*napay hi add dinhi para ma scroll2 siya */
-    justify-content: center;
-    align-items: center;
-    gap: 500px;
-    font-size: 14px;
-    font-weight: 100;
-    margin-top: 130px;
-    border: 1px solid rgba(168, 110, 92, 1);
-    border-radius: 8px;
-    padding-bottom: 30%;
-    box-shadow: 0px 12px 5px rgba(226, 221, 221, 0.479);
-    margin-left: 50px;
-    margin-right: 50px;
+.adduserbutton:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,58,237,0.55); }
 
-    
+.removeuserbutton {
+  background: rgba(248,113,113,0.1);
+  color: #f87171;
+  border: 1.5px solid rgba(248,113,113,0.25);
 }
-.line2{
-    border: 1px solid rgba(168, 110, 92, 1);
-    position: absolute;
-    top: 420px;
-    left: 57px;
-    right: 57px;
+.removeuserbutton:hover { background: rgba(248,113,113,0.18); }
+
+.recent {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(196,181,253,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 0 36px;
+  margin-bottom: 12px;
+}
+
+.search {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(167,139,250,0.14);
+  background: rgba(255,255,255,0.04);
+  color: #f5f3ff;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  width: calc(100% - 72px);
+  margin: 0 36px 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search::placeholder { color: rgba(167,139,250,0.35); }
+.search:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.16); }
+
+.tableCard {
+  margin: 0 36px 36px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(167,139,250,0.1);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid rgba(167,139,250,0.1);
+}
+.tableHeader h1 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(167,139,250,0.45);
+  padding: 14px 20px;
+  margin: 0;
 }

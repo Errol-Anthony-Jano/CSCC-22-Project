@@ -1,15 +1,19 @@
 import styles from "./confirmation.module.css";
 
-function Confirmation({onConfirm, onClose}) {
-    return (
-        <div className={styles.confirmationpage}>
-            <div className={styles.confirmationcontainer}>
-                <h1 className={styles.confirmationtitle}>REMOVING</h1>
-                <p className={styles.confirmationmessage}>Are you sure you want to remove this user?</p>
-                <button onClick={onConfirm} className={styles.confirmbuttons}>Yes</button> {/*need to change this if hi connect sa database*/}
-                <button onClick={onClose} className={styles.confirmbuttons}>Cancel</button>
-            </div>
+function Confirmation({ onConfirm, onClose }) {
+  return (
+    <div className={styles.overlay}>
+      <div className={styles.card}>
+        <div className={styles.icon}>⚠️</div>
+        <h2 className={styles.title}>Are you sure?</h2>
+        <p className={styles.message}>This user will be archived and can no longer log in. This action cannot be easily undone.</p>
+        <div className={styles.buttonRow}>
+          <button className={styles.confirmBtn} onClick={onConfirm}>Yes, Remove</button>
+          <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
+
 export default Confirmation;

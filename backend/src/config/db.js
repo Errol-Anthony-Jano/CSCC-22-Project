@@ -10,15 +10,17 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: resolve(__dirname, '../../.env') });
 
 let DB_URL = null;
+let sequelizeConfig = {};
 
 if (process.env.NODE_ENV !== "test") {
   DB_URL = `postgres://${process.env.PG_USER}:${process.env.PG_PASSWORD}@localhost:5432/${process.env.PG_DB}`;
 }
 else {
-  DB_URL = `postgres://${process.env.PG_USER}:${process.env.PG_PASSWORD}@localhost:5432/test_db`;
+  DB_URL = `sqlite::memory:`;
+  sequelizeConfig = { logging: false };
 }
 
-export const sequelize = new Sequelize(DB_URL);
+export const sequelize = new Sequelize(DB_URL, sequelizeConfig);
 
 const models = initModels(sequelize);
 

@@ -6,23 +6,8 @@ beforeAll(async () => {
         throw new Error("Error: Running tests while not in test mode strictly prohibited. Run npm test first.");
     }
     
-    await sequelize.model('users').sync({ force: true });
-    await sequelize.model('products').sync({ force: true });
-    await sequelize.model('transactions').sync({ force: true });
-    await sequelize.model('transaction_items').sync({ force: true });
-
-    const models = Object.values(sequelize.models);
-
-    for (const model of models) {
-        if (model.tableName !== "SequelizeMeta") {
-            await model.destroy({
-                where: {},
-                truncate: true,
-                cascade: true,
-                restartIdentity: true
-            });
-        }
-    }
+    // Sync all models to the database by replacing old tables
+    await sequelize.sync({ force: true });
 })
 
 afterAll(async () => {
