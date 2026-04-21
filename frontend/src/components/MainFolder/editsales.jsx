@@ -16,7 +16,8 @@ function EditSales({ onClose }) {
             <option value="">Select Method</option>
             <option value="cash">Cash</option>
              <option value="gcash">Gcash</option>
-            <option value="bank">Bank Transfer</option>
+            <option value="credit">Credit Card</option>
+            <option value="debit">Debit Card</option>
             <option value="cheque">Cheque</option>
            
         </select>

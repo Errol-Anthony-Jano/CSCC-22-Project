@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './Navbar';
 import EditAvailable from './editavailable';
 import AddProduct from './addproduct';
@@ -6,49 +6,80 @@ import styles from './Available.module.css';
 
 const Available = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [products, setProducts] = useState([
-    { name: 'PANTS', quantity: 1, id: 214, price: '₱200' },
-    { name: 'T-SHIRT', quantity: 3, id: 107, price: '₱350' },
-    { name: 'JEANS', quantity: 2, id: 412, price: '₱890' },
-    { name: 'JACKET', quantity: 1, id: 156, price: '₱1,250' },
-    { name: 'SHORTS', quantity: 5, id: 328, price: '₱180' },
-    { name: 'HOODIE', quantity: 2, id: 507, price: '₱1,500' },
-    { name: 'SWEATER', quantity: 4, id: 623, price: '₱1,200' },
-    { name: 'BLAZER', quantity: 1, id: 789, price: '₱2,500' },
-    { name: 'SKIRT', quantity: 3, id: 341, price: '₱450' },
-  ]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products');
+      if (!response.ok) throw new Error('Failed to fetch products');
+      const data = await response.json();
+      const mapped = data.map(p => ({
+        id: p.product_id,
+        name: p.product_name,
+        quantity: p.product_quantity,
+        price: `₱${p.product_unit_price}`
+      }));
+      setProducts(mapped);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   const openEdit = (product) => {
     setSelectedProduct(product);
     setIsEditing(true);
-    setIsAdding(false);
   };
+
   const openAdd = () => {
     setIsAdding(true);
-    setIsEditing(false);
     setSelectedProduct(null);
   };
+
   const closeEdit = () => {
     setIsEditing(false);
     setSelectedProduct(null);
   };
+
   const closeAdd = () => {
     setIsAdding(false);
+    fetchProducts(); // refresh list after adding
   };
 
-  const saveProduct = (updatedValues) => {
-    setProducts(products.map((product) =>
-      product.id === selectedProduct.id ? { ...product, ...updatedValues } : product
-    ));
-    closeEdit();
+  const saveProduct = async (updatedValues) => {
+    try {
+      const response = await fetch(`/api/products/${selectedProduct.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_quantity: updatedValues.quantity,
+          product_unit_price: parseInt(updatedValues.price.replace(/[^\d]/g, ''))
+        })
+      });
+      if (!response.ok) throw new Error('Update failed');
+      fetchProducts();
+      closeEdit();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update product');
+    }
   };
+
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.id.toString().includes(searchTerm)
   );
+
+  if (loading) return <div>Loading products...</div>;
 
   return (
     <>
@@ -65,11 +96,9 @@ const Available = () => {
             />
             <button className={styles.add} onClick={openAdd}>ADD</button>
           </div>
-
           <div className={styles.header}>
             <h1>Available Product</h1>
           </div>
-
           <div className={styles['product-grid-wrapper']}>
             <div className={styles['product-list']}>
               {filteredProducts.map((product) => (
@@ -88,18 +117,10 @@ const Available = () => {
             </div>
           </div>
         </div>
-
         {isEditing && selectedProduct && (
-          <EditAvailable
-            key={selectedProduct.id}
-            product={selectedProduct}
-            onClose={closeEdit}
-            onSave={saveProduct}
-          />
+          <EditAvailable product={selectedProduct} onClose={closeEdit} onSave={saveProduct} />
         )}
-        {isAdding && (
-          <AddProduct onClose={closeAdd} />
-        )}
+        {isAdding && <AddProduct onClose={closeAdd} />}
       </div>
     </>
   );

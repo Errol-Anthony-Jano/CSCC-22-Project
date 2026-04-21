@@ -1,4 +1,4 @@
-FROM node:24-slim
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
@@ -12,4 +12,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["node", "--watch", "src/index.js"]
+CMD ["node", "src/index.js"]
