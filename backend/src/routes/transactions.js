@@ -43,7 +43,7 @@ transactionsRouter.post('/', validate(insertTransactionSchema), async (req, res,
 })
 
 // -> update transaction 
-transactionsRouter.post('/:transactionId', validate(updateTransactionSchema), async (req, res, next) => {
+transactionsRouter.patch('/:transactionId', validate(updateTransactionSchema), async (req, res, next) => {
   try {
     await sequelize.transaction(async t => {
       const txnPayload = await updateTransaction(req.params.transactionId, req.body, t);
