@@ -3,8 +3,9 @@ import express from "express";
 export const transactionsRouter = express.Router();
 
 import models, { sequelize } from "../config/db.js";
-import { validateTransaction } from "../middleware/transactionsMiddleware.js";
-import { insertTransaction } from "../controllers/transactionsController.js";
+import { validate } from "../middleware/transactionsMiddleware.js";
+import { insertTransaction, updateTransaction } from "../controllers/transactionsController.js";
+import { insertTransactionSchema, updateTransactionSchema } from "../schemas/schemas.js";
 
 /*
 expected payload: 
@@ -13,16 +14,6 @@ expected payload:
   items: {...},
 }
 */
-const transactionsSchema = {
-  operation: "string",
-  prev_txn_id: "number",
-  transaction_timestamp: "number",
-  payment_type: "string",
-  payment_refstr: "string",
-  created_by: "number",
-  voided_at: "number",
-  items: "object",
-}
 
 //add error handling
 // -> get all transactions
@@ -37,16 +28,31 @@ transactionsRouter.get('/', async (req, res) => {
 })
 
 // -> record transaction
-transactionsRouter.post('/', validateTransaction(transactionsSchema), async (req, res, next) => {
+transactionsRouter.post('/', validate(insertTransactionSchema), async (req, res, next) => {
   try {
     await sequelize.transaction(async t => {
       const txnPayload = await insertTransaction(req.body, t);
       if (txnPayload) {
-        return res.status(201).json({ message: "Product inserted successfully." });
+        return res.status(201).json({ message: "Transaction inserted successfully.", data: txnPayload });
       }
     })
   }
   catch (error) {
-    return res.status(error.status || 500).statusMessage({ message: error.message });
+    return res.status(error.status || 500).json({ message: error.message });
+  }
+})
+
+// -> update transaction 
+transactionsRouter.post('/:transactionId', validate(updateTransactionSchema), async (req, res, next) => {
+  try {
+    await sequelize.transaction(async t => {
+      const txnPayload = await updateTransaction(req.params.transactionId, req.body, t);
+      if (txnPayload) {
+        return res.status(200).json({ message: "Transaction updated successfully.", data: txnPayload });
+      }
+    })
+  }
+  catch (error) {
+    return res.status(error.status || 500).json({ message: error.message });
   }
 })
