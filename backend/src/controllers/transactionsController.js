@@ -40,11 +40,9 @@ export const updateTransaction = async (oldTxn, updatedPayload, t) => {
         })
     }
 
-    await models.transactions.update(
-        { voided_at: new Date(), prev_txn_id: oldTxn.transaction_id },
-        { where: { transaction_id: oldTxn.transaction_id }, transaction: t }
-    );
-
+    const s = await models.transactions.findByPk(oldTxn.transaction_id);
+    await s.update({ voided_at: Date.now() }, { transaction: t });
+    
     const newTxn = await insertTransaction(updatedPayload, t);
 
     return newTxn;
