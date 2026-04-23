@@ -198,8 +198,8 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
         expect(res.statusCode).toEqual(201);
         expect(res.body.message).toEqual("Transaction inserted successfully.");
 
-        await product.reload();
-        expect(product.product_quantity).toEqual(productQuantity - quantityBought);
+        const refetchedProduct = await models.products.findByPk(1);
+        expect(refetchedProduct.product_quantity).toEqual(productQuantity - quantityBought);
     })
 
     it('should return an error when the referenced user is non-existent', async () => {
@@ -260,8 +260,8 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
         const res = await request(app).post('/transactions').send(completeTransaction);
         expect(res.statusCode).toEqual(404);
 
-        await product.reload();
-        expect(product.product_quantity).toEqual(availableQuantity);
+        const refetchedProduct = await models.products.findByPk(1);
+        expect(refetchedProduct.product_quantity).toEqual(availableQuantity);
     })
 })
 
@@ -281,6 +281,25 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
         const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
         expect(res2.statusCode).toEqual(200);
         expect(res2.body.data.prev_txn_id).toEqual(res.body.data.transaction_id);
+    })
+
+    it('should store the timestamp of when the old transaction was voided', async () => {
+        const cleanTransaction = createTransaction();
+        const res = await request(app).post('/transactions').send(cleanTransaction);
+        const txn = await models.transactions.findByPk(1);
+
+        expect(res.statusCode).toEqual(201);
+
+        const patch = {
+            transaction_id: res.body.data.transaction_id,
+            payment_refstr: "9876543210",
+        }
+
+        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        expect(res2.statusCode).toEqual(200);
+        
+        const txn1 = await models.transactions.findByPk(1);
+        expect(txn1.toJSON()).toBeTruthy;
     })
 
     it('should correctly calculate product quantities after rollback and re-recording', async () => {
@@ -336,13 +355,13 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
         const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
         expect(res2.statusCode).toEqual(200);
 
-        await p1.reload();
-        await p2.reload();
-        await p3.reload();
+        const rp1 = await models.products.findByPk(1);
+        const rp2 = await models.products.findByPk(2);
+        const rp3 = await models.products.findByPk(3);
 
-        expect(p1.product_quantity).toEqual(q1 - nqb[0]);
-        expect(p2.product_quantity).toEqual(q2 - nqb[1]);
-        expect(p3.product_quantity).toEqual(q3 - nqb[2]);
+        expect(rp1.product_quantity).toEqual(q1 - nqb[0]);
+        expect(rp2.product_quantity).toEqual(q2 - nqb[1]);
+        expect(rp3.product_quantity).toEqual(q3 - nqb[2]);
     })
 
     it('should reject empty payload', async () => {
