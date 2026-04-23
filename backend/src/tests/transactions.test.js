@@ -18,7 +18,6 @@ describe('UNIT TESTS: validating a payload for inserting transactions', async ()
     it('should accept a valid payload with GCash as payment method', async () => {
         const validTransaction = createTransaction();
         const result = performValidation(insertTransactionSchema, validTransaction);
-        console.log(result);
         expect(result.isValid).toEqual(true);
     })
 
@@ -93,6 +92,24 @@ describe('UNIT TESTS: validating a payload for inserting transactions', async ()
         const result = performValidation(insertTransactionSchema, invalidTransaction);
         expect(result.isValid).toEqual(false);
     })
+
+    it('should reject a payload when duplicate items are detected', async () => {
+        const invalidTransaction = createTransaction({
+            transaction_items: [
+                {
+                    product_id: 1,
+                    product_quantity: 5,
+                },
+                {
+                    product_id: 1,
+                    product_quantity: 6,
+                }
+            ]
+        })
+
+        const result = performValidation(insertTransactionSchema, invalidTransaction);
+        expect(result.isValid).toEqual(false);
+    })
 })
 
 describe('UNIT TESTS: validating a payload for updating transactions', async () => {
@@ -137,6 +154,24 @@ describe('UNIT TESTS: validating a payload for updating transactions', async () 
         const result = performValidation(updateTransactionSchema, invalidUpdate);
         expect(result.isValid).toEqual(false);
     })
+
+    it('should reject an update when provided transaction items contain duplicate products', async () => {
+        const invalidTransaction = createTransaction({
+            transaction_items: [
+                {
+                    product_id: 1,
+                    product_quantity: 5,
+                },
+                {
+                    product_id: 1,
+                    product_quantity: 6,
+                }
+            ]
+        })
+
+        const result = performValidation(updateTransactionSchema, invalidTransaction);
+        expect(result.isValid).toEqual(false);
+    })
 })
 
 describe("UNIT TESTS - transaction business logic", async () => {
@@ -161,7 +196,7 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
 
         const res = await request(app).post('/transactions').send(validTransaction);
         expect(res.statusCode).toEqual(201);
-        console.log(res.body.message);
+        expect(res.body.message).toEqual("Transaction inserted successfully.");
 
         await product.reload();
         expect(product.product_quantity).toEqual(productQuantity - quantityBought);
@@ -171,14 +206,13 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
         const completeTransaction = createTransaction({ created_by: 9999 });
 
         const res = await request(app).post('/transactions').send(completeTransaction);
-        console.log(res.body.message);
+        expect(res.body.message).toEqual("User not found.");
         expect(res.statusCode).toEqual(404); // user not found
     })
 
     it('should return an error when transaction items is not provided', async () => {
         const completeTransaction = createTransaction({ transaction_items: null });
         const res = await request(app).post('/transactions').send(completeTransaction);
-        console.log(res.body.message);
         expect(res.statusCode).toEqual(400);
     })
 
@@ -191,7 +225,7 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
         ]})
 
         const res = await request(app).post('/transactions').send(completeTransaction);
-        console.log(res.body.message);
+        expect(res.body.message).toEqual("Product not found.");
         expect(res.statusCode).toEqual(404);
     })
 
@@ -204,7 +238,7 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
         ]})
 
         const res = await request(app).post('/transactions').send(completeTransaction);
-        console.log(res.body.message);
+        expect(res.body.message).toEqual("Quantity purchased is higher than the available quantity of the particular product.")
         expect(res.statusCode).toEqual(400);
     })
 
@@ -223,8 +257,9 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
             }
         ]})
 
-        const res = await request(app).post('/transaction').send(completeTransaction);
+        const res = await request(app).post('/transactions').send(completeTransaction);
         expect(res.statusCode).toEqual(404);
+
         await product.reload();
         expect(product.product_quantity).toEqual(availableQuantity);
     })
@@ -236,7 +271,6 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
         const res = await request(app).post('/transactions').send(cleanTransaction);
         const txn = await models.transactions.findByPk(1);
 
-        console.log(res.body.message);
         expect(res.statusCode).toEqual(201);
 
         const patch = {
@@ -244,11 +278,7 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
             payment_refstr: "9876543210",
         }
 
-        const res2 = await request(app).post(`/transactions/${res.body.data.transaction_id}`).send(patch);
-
-        await txn.reload();
-        console.log(txn.toJSON(), res2.body.data);
-
+        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
         expect(res2.statusCode).toEqual(200);
         expect(res2.body.data.prev_txn_id).toEqual(res.body.data.transaction_id);
     })
@@ -302,11 +332,8 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
                 }
             ]
         })
-
-        console.log(patch);
-        
-        const res2 = await request(app).post('/transactions/1').send(patch);
-        console.log(res2.body.message);
+  
+        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
         expect(res2.statusCode).toEqual(200);
 
         await p1.reload();
@@ -316,5 +343,28 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
         expect(p1.product_quantity).toEqual(q1 - nqb[0]);
         expect(p2.product_quantity).toEqual(q2 - nqb[1]);
         expect(p3.product_quantity).toEqual(q3 - nqb[2]);
+    })
+
+    it('should reject empty payload', async () => {
+        const validTransaction = createTransaction();
+        const res = await request(app).post('/transactions').send(validTransaction);
+
+        const patch = {};
+
+        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        expect(res2.statusCode).toEqual(400);
+    })
+
+    it('should reject a patch payload that changes nothing in the original data', async () => {
+        const validTransaction = createTransaction();
+        const res = await request(app).post('/transactions').send(validTransaction);
+
+        const patch = {
+            payment_type: validTransaction.payment_type,
+            payment_refstr: validTransaction.payment_refstr,
+        }
+
+        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        expect(res2.statusCode).toEqual(400);
     })
 })
