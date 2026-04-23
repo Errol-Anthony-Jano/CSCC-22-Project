@@ -1,36 +1,39 @@
-import { containsInvalidKeys, validatePayloadDataTypes } from "./payloadValidator.js";
-import { checkPaymentType, containsOperation, containsRequiredInsertFields, containsRequiredUpdateFields } from "./transactionValidator.js"
+import { defaultValueSchemable } from "sequelize/lib/utils";
 
-export const validateTransaction = (schema) => {
+export const validate = (schema) => {
     return (req, res, next) => {
-        const payloadKeys = Object.keys(req.body);
-        const schemaKeys = Object.keys(schema);
+        const result = performValidation(schema, req.body);
 
-        if (!containsOperation(req.body)) {
-            return res.status(400).json({ message: "operation key not found in payload." });
+        if (!result.isValid) {
+            return res.status(400).json({ errors: result.errors });
         }
 
-        if (!containsInvalidKeys(payloadKeys, schemaKeys)) {
-            return res.status(400).json({ message: "Invalid fields detected." });
-        }
-
-        if (req.body["operation"] === "insert" && !containsRequiredInsertFields(payloadKeys)) {
-            return res.status(400).json({ message: "Please include all necessary fields for inserts."});
-        }
-
-        if (req.body["operation"] === "update" && !containsRequiredUpdateFields(payloadKeys)) {
-            return res.status(400).json({ message: "Please include all necessary fields for updates." });
-        }
-
-        if (!checkPaymentType(req.body)) {
-            return res.status(400).json({ message: "Please make sure to provide the reference string for GCash payments."});
-        }
-
-        if (!validatePayloadDataTypes(req.body, payloadKeys, schema)) {
-            return res.status(400).json({ message: "Please make sure to provide the correct data types for the payload."});
-        }
-
+        req.body = result.value;
         delete req.body["operation"];
         next();
+    }
+}
+
+export const performValidation = (schema, data) => {
+    const { error, value } = schema.validate(data, {
+        abortEarly: true,
+        stripUnknown: true,
+        convert: true,
+    });
+
+    if (error) {
+        return {
+            isValid: false,
+            errors: error.details.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }))
+        };
+    }
+
+    return {
+        isValid: true,
+        value: value,
+        errors: null,
     }
 }
