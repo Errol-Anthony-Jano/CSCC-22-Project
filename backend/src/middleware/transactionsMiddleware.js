@@ -76,6 +76,8 @@ export const carvePayload = async (req, res, next) => {
             delete item["product_unit_price"];
         }
 
+        req.updatedPayload["prev_txn_id"] = req.oldTxn.transaction_id;
+
         next();
     }
     catch (error) {
