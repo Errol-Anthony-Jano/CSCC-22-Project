@@ -48,8 +48,8 @@ transactionsRouter.post('/', validate(insertTransactionSchema), async (req, res,
 // -> update transaction 
 transactionsRouter.patch('/:transactionId', 
   fetchUpdateableTransaction, 
-  carvePayload,
   validate(updateTransactionSchema), 
+  carvePayload,
   async (req, res, next) => {
     try {
       let result;
