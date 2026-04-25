@@ -8,16 +8,6 @@ import { insertTransaction, updateTransaction } from "../controllers/transaction
 import { insertTransactionSchema, updateTransactionSchema } from "../schemas/schemas.js";
 import { fetchUpdateableTransaction } from "../middleware/transactionsMiddleware.js";
 
-/*
-expected payload: 
-{
-  transaction: {...},
-  items: {...},
-}
-*/
-
-//add error handling
-// -> get all transactions
 transactionsRouter.get('/', async (req, res) => {
   const transactions = await models.transactions.findAll({
     include: {
@@ -41,6 +31,7 @@ transactionsRouter.post('/', validate(insertTransactionSchema), async (req, res,
     }
   }
   catch (error) {
+    console.error("Error in insert: ", error);
     return res.status(error.status || 500).json({ message: error.message });
   }
 })
@@ -62,6 +53,7 @@ transactionsRouter.patch('/:transactionId',
       }
     }
     catch (error) {
+      console.error("Error in patch: ", error);
       return res.status(error.status || 500).json({ message: error.message });
     }
 })
