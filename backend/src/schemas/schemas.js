@@ -1,7 +1,6 @@
 import Joi from 'joi';
 
 export const insertTransactionSchema = Joi.object({
-    prev_txn_id: Joi.number().positive().allow('null'),
     payment_type: Joi.string().valid("Cash", "GCash").required(),
     payment_refstr: Joi.string().allow('', 'null').when('payment_type', {
         is: Joi.valid('GCash'),
