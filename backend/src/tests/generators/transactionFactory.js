@@ -1,6 +1,4 @@
 export const createTransaction = (overrides = {}) => ({
-    operation: "insert",
-    transaction_timestamp: Date.now(),
     payment_type: "GCash",
     payment_refstr: Math.random().toString(), // Randomize to avoid DB unique constraints
     created_by: 1,
@@ -9,6 +7,5 @@ export const createTransaction = (overrides = {}) => ({
 });
 
 export const createUpdatePayload = (overrides = {}) => ({
-    transaction_id: 1,
     ...overrides
 })

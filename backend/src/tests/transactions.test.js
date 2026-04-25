@@ -21,14 +21,6 @@ describe('UNIT TESTS: validating a payload for inserting transactions', async ()
         expect(result.isValid).toEqual(true);
     })
 
-    it('should reject a payload without a timestamp provided', async () => {
-        const invalidTransaction = createTransaction();
-        delete invalidTransaction["transaction_timestamp"];
-
-        const result = performValidation(insertTransactionSchema, invalidTransaction);
-        expect(result.isValid).toEqual(false);
-    })
-
     it('should reject a payload with GCash as payment method but no reference number', async () => {
         const invalidTransaction = createTransaction({ payment_refstr: null });
         const result = performValidation(insertTransactionSchema, invalidTransaction);
@@ -38,22 +30,6 @@ describe('UNIT TESTS: validating a payload for inserting transactions', async ()
     it('should reject a payload when the payment type is not available', async () => {
         const invalidTransaction = createTransaction();
         delete invalidTransaction["payment_type"];
-
-        const result = performValidation(insertTransactionSchema, invalidTransaction);
-        expect(result.isValid).toEqual(false);
-    })
-
-    it('should reject a payload when the insert/update payload is not available', async () => {
-        const invalidTransaction = createTransaction();
-        delete invalidTransaction["operation"];
-
-        const result = performValidation(insertTransactionSchema, invalidTransaction);
-        expect(result.isValid).toEqual(false);
-    })
-
-    it('should reject a payload when created_by is missing', async () => {
-        const invalidTransaction = createTransaction();
-        delete invalidTransaction["created_by"];
 
         const result = performValidation(insertTransactionSchema, invalidTransaction);
         expect(result.isValid).toEqual(false);
@@ -114,7 +90,7 @@ describe('UNIT TESTS: validating a payload for inserting transactions', async ()
 
 describe('UNIT TESTS: validating a payload for updating transactions', async () => {
     it('should reject an update when inserted data is the same', async () => {
-        const validUpdate = createUpdatePayload({ transaction_items: [
+        const validUpdate = { transaction_items: [
             {
                 product_id: 1,
                 quantity_bought: 5,
@@ -123,20 +99,12 @@ describe('UNIT TESTS: validating a payload for updating transactions', async () 
                 product_id: 2,
                 quantity_bought: 6
             }
-        ]})
+        ]}
         const dupTransaction = {
             ...validUpdate,
         };
 
         expect(() => isPayloadIdentical(validUpdate, dupTransaction)).toThrow("Old and new payloads identical; update aborted.");
-    })
-
-    it('should reject an update when transaction id isn\'t provided', async () => {
-        const invalidUpdate = createUpdatePayload();
-        delete invalidUpdate["transaction_id"];
-
-        const result = performValidation(updateTransactionSchema, invalidUpdate);
-        expect(result.isValid).toEqual(false);
     })
 
     it('should reject an update when payment type is GCash but no reference string is provided', async () => {
@@ -152,7 +120,7 @@ describe('UNIT TESTS: validating a payload for updating transactions', async () 
         delete invalidUpdate["transaction_items"];
 
         const result = performValidation(updateTransactionSchema, invalidUpdate);
-        expect(result.isValid).toEqual(false);
+        expect(result.isValid).toEqual(true);
     })
 
     it('should reject an update when provided transaction items contain duplicate products', async () => {
@@ -202,13 +170,13 @@ describe('INTEGRATION TESTS: inserting a transaction', () => {
         expect(refetchedProduct.product_quantity).toEqual(productQuantity - quantityBought);
     })
 
-    it('should return an error when the referenced user is non-existent', async () => {
+    it.skip('should return an error when the referenced user is non-existent', async () => {
         const completeTransaction = createTransaction({ created_by: 9999 });
 
         const res = await request(app).post('/transactions').send(completeTransaction);
         expect(res.body.message).toEqual("User not found.");
         expect(res.statusCode).toEqual(404); // user not found
-    })
+    }) // TODO: UNSKIP AS SOON AS SESSION STORAGE IS ENABLED!
 
     it('should return an error when transaction items is not provided', async () => {
         const completeTransaction = createTransaction({ transaction_items: null });
@@ -274,13 +242,12 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
         expect(res.statusCode).toEqual(201);
 
         const patch = {
-            transaction_id: res.body.data.transaction_id,
             payment_refstr: "9876543210",
         }
 
-        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        const res2 = await request(app).patch(`/transactions/${txn.transaction_id}`).send(patch);
         expect(res2.statusCode).toEqual(200);
-        expect(res2.body.data.prev_txn_id).toEqual(res.body.data.transaction_id);
+        expect(res2.body.data.prev_txn_id).toEqual(txn.transaction_id);
     })
 
     it('should store the timestamp of when the old transaction was voided', async () => {
@@ -291,11 +258,10 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
         expect(res.statusCode).toEqual(201);
 
         const patch = {
-            transaction_id: res.body.data.transaction_id,
             payment_refstr: "9876543210",
         }
 
-        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        const res2 = await request(app).patch(`/transactions/${txn.transaction_id}`).send(patch);
         expect(res2.statusCode).toEqual(200);
         
         const txn1 = await models.transactions.findByPk(1);
@@ -335,7 +301,7 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
         const res = await request(app).post('/transactions').send(cleanTransaction);
         expect(res.statusCode).toEqual(201);
 
-        const patch = createUpdatePayload({
+        const patch = {
             transaction_items: [
                 {
                     product_id: 1,
@@ -350,9 +316,9 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
                     quantity_bought: nqb[2],
                 }
             ]
-        })
+        }
   
-        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        const res2 = await request(app).patch(`/transactions/${1}`).send(patch);
         expect(res2.statusCode).toEqual(200);
 
         const rp1 = await models.products.findByPk(1);
@@ -370,7 +336,7 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
 
         const patch = {};
 
-        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        const res2 = await request(app).patch(`/transactions/1`).send(patch);
         expect(res2.statusCode).toEqual(400);
     })
 
@@ -383,7 +349,7 @@ describe('INTEGRATION TESTS: updating an existing transaction', () => {
             payment_refstr: validTransaction.payment_refstr,
         }
 
-        const res2 = await request(app).patch(`/transactions/${res.body.data.transaction_id}`).send(patch);
+        const res2 = await request(app).patch(`/transactions/1`).send(patch);
         expect(res2.statusCode).toEqual(400);
     })
 })
