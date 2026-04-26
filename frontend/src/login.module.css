@@ -1,59 +1,100 @@
-.loginpage{
+.loginpage {
     display: flex;
     min-height: 100vh;
-    background-color: rgb(223, 202, 188)
+    background-color: rgb(223, 202, 188);
 }
-.logincontainer{
+
+.logincontainer {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.5);
     padding: 20px;
-    padding-top: 80px;
+    padding-top: 60px;
     margin: 150px auto;
     max-width: 350px;
-    height: 508px;
- 
-   
+    height: auto;
+    min-height: 500px;
 }
-.usernamefont{
+
+.usernamefont {
     color: rgba(74, 51, 45, 1);
     font-family: 'Inter', sans-serif;
-    font-weight: 1;
-    font-size: 16px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 5px;
 }
-.useridfont{
+
+.useridfont {
     color: rgba(74, 51, 45, 1);
     font-family: 'Inter', sans-serif;
-    font-weight: 1;
-    font-size: 16px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 5px;
 }
-.passwordfont{
+
+.passwordfont {
     color: rgba(74, 51, 45, 1);
     font-family: 'Inter', sans-serif;
-    font-weight: 1;
-    font-size: 16px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 5px;
 }
-.logincontainer input{
-    width: 300px;
-    height: 30px;
-    border-radius: 5px;
-    border: 1px solid rgba(168, 110, 92, 1);
+
+.logincontainer input {
+    width: 100%;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid rgba(168, 110, 92, 0.5);
     margin-bottom: 20px;
-    padding: 5px;
+    padding: 0 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: all 0.2s;
 }
-.loginbutton{
-    width: 300px;
-    height: 30px;
-    border-radius: 5px;
+
+.logincontainer input:focus {
+    outline: none;
+    border-color: rgba(152, 116, 96, 1);
+    box-shadow: 0 0 0 2px rgba(152, 116, 96, 0.1);
+}
+
+.loginbutton {
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
     border: none;
     background-color: rgba(152, 116, 96, 0.9);
     color: white;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
-    margin-top: 30px;
+    margin-top: 20px;
+    transition: all 0.2s;
 }
-.loginbutton:hover{
-    background-color: rgba(152, 116, 96, 1);
-    transition: 0.3s;
 
+.loginbutton:hover {
+    background-color: rgba(152, 116, 96, 1);
+    transform: translateY(-1px);
+}
+
+
+.welcomeWrapper {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.welcome {
+    color: rgba(152, 116, 96, 1);
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.welcomeCaption {
+    color: rgba(74, 51, 45, 0.6);
+    font-size: 13px;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
 }
