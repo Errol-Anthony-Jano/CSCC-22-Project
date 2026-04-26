@@ -25,6 +25,8 @@ export const validateInsertPayload = (schema) => {
         if (!validateValueConstraints(req.body, payloadKeys, schema)) {
             return res.status(400).json({ message: "Data outside boundaries."});
         }
+
+        next();
     }
 }
 
@@ -53,6 +55,23 @@ export const validatePatchPayload = (schema) => {
             return res.status(400).json({ message: "Data outside of boundaries." });
         }
 
+        next();
+    }
+}
+
+export const checkValidQuery = () => {
+    return (req, res, next) => {
+        const { name } = req.query;
+        const trimmedName = name ? name.trim() : null;
+        if (!trimmedName) {
+            return res.status(400).json({ message: "Query parameter 'name' is required." });
+        }
+        if (trimmedName.length > 255) {
+            return res.status(400).json({ message: "Query parameter 'name' is too long." });
+        }
+        if (trimmedName.length < 2) {
+            return res.status(400).json({ message: "Query parameter 'name' is too short." });
+        }
         next();
     }
 }
