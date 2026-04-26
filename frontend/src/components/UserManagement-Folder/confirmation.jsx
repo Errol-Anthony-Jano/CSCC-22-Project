@@ -11,6 +11,8 @@ function Confirmation({ onConfirm, onClose, username }) {
             if (success) {
                 alert(`User "${username || 'the user'}" has been removed successfully!`);
                 onClose();
+            } else {
+                alert("Failed to remove user. Please try again.");
             }
         } catch (err) {
             console.error(err);

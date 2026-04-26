@@ -1,5 +1,6 @@
 import styles from "./adduserpopup.module.css";
 import { useState } from "react";
+import { useAddUser } from "../../hooks/useUsers";
 
 function AddUserPopup({ onClose, onUserAdded, existingUsers = [] }) {
     const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ function AddUserPopup({ onClose, onUserAdded, existingUsers = [] }) {
         confirmPassword: ""
     });
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+    const addUserMutation = useAddUser();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -17,7 +18,7 @@ function AddUserPopup({ onClose, onUserAdded, existingUsers = [] }) {
         setError("");
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // Validation
         if (!formData.username.trim() || !formData.password) {
             setError("Please fill in all required fields.");
@@ -41,7 +42,7 @@ function AddUserPopup({ onClose, onUserAdded, existingUsers = [] }) {
         
         // Check if username already exists
         const userExists = existingUsers.some(
-            user => user.username.toLowerCase() === formData.username.toLowerCase()
+            user => user.username?.toLowerCase() === formData.username.toLowerCase()
         );
         
         if (userExists) {
@@ -49,25 +50,25 @@ function AddUserPopup({ onClose, onUserAdded, existingUsers = [] }) {
             return;
         }
 
-        setLoading(true);
-        
-        setTimeout(() => {
+        try {
             const newUser = {
-                id: Date.now(),
                 username: formData.username,
                 role: formData.role,
-                createdAt: new Date().toISOString(),
-                password: formData.password 
+                password: formData.password
             };
             
+            const result = await addUserMutation.mutateAsync(newUser);
+            
             if (onUserAdded) {
-                onUserAdded(newUser);
+                onUserAdded(result);
             }
             
             alert("User added successfully!");
-            setLoading(false);
             onClose();
-        }, 500);
+        } catch (err) {
+            setError("Failed to add user. Please try again.");
+            console.error(err);
+        }
     };
 
     return (
@@ -125,9 +126,9 @@ function AddUserPopup({ onClose, onUserAdded, existingUsers = [] }) {
                 <button 
                     onClick={handleSubmit} 
                     className={styles.buttonpop}
-                    disabled={loading}
+                    disabled={addUserMutation.isLoading}
                 >
-                    {loading ? "Adding..." : "Add User"}
+                    {addUserMutation.isLoading ? "Adding..." : "Add User"}
                 </button>
                 <br />
                 <button onClick={onClose} className={styles.buttonpop}>

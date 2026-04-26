@@ -2,38 +2,34 @@ import styles from "./sales.module.css";
 import { Navbar } from "../MainFolder/Navbar";
 import AddSales from "./addsales";
 import EditSales from "./editsales";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useTransactions, useAddTransaction, useUpdateTransaction } from "../../hooks/useTransactions";
 
 function Sales() {
     const [showaddsales, setshowaddsales] = useState(false);
     const [showeditsales, setshoweditsales] = useState(false);
-    const [transactions, setTransactions] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedTransaction, setSelectedTransaction] = useState(null);
-
-    useEffect(() => {
-        loadTransactions();
-    }, []);
-
-    const loadTransactions = () => {
-        const storedTransactions = localStorage.getItem("transactions");
-        if (storedTransactions) {
-            setTransactions(JSON.parse(storedTransactions));
-        } else {
-            const defaultTransactions = [
-                { id: 1, product: "Wireless Earbuds", datetime: "2026-04-05T10:30", paymentMethod: "Cash", revenue: 2500, quantity: 2, transactionId: "" },
-                { id: 2, product: "Gaming Mouse", datetime: "2026-04-04T15:20", paymentMethod: "Gcash", revenue: 1200, quantity: 1, transactionId: "GCASH-123456" },
-                { id: 3, product: "Mechanical Keyboard", datetime: "2026-04-03T11:45", paymentMethod: "Bank Transfer", revenue: 3500, quantity: 1, transactionId: "" },
-                { id: 4, product: "USB-C Hub", datetime: "2026-04-02T09:15", paymentMethod: "Cash", revenue: 800, quantity: 3, transactionId: "" },
-                { id: 5, product: "Laptop Stand", datetime: "2026-04-01T14:30", paymentMethod: "Gcash", revenue: 1500, quantity: 2, transactionId: "GCASH-789012" },
-            ];
-            setTransactions(defaultTransactions);
-            localStorage.setItem("transactions", JSON.stringify(defaultTransactions));
+    
+    const { data: transactionsData, isLoading, isError } = useTransactions();
+    const addTransactionMutation = useAddTransaction();
+    const updateTransactionMutation = useUpdateTransaction();
+    
+    // Handle different response structures
+    let transactions = [];
+    if (transactionsData) {
+        if (Array.isArray(transactionsData)) {
+            transactions = transactionsData;
+        } else if (transactionsData.data && Array.isArray(transactionsData.data)) {
+            transactions = transactionsData.data;
         }
-    };
+    }
+
+    if (isLoading) return <div className={styles.loading}>Loading transactions...</div>;
+    if (isError) return <div className={styles.error}>Connection lost to server. Using local data.</div>;
 
     const filteredTransactions = transactions.filter(transaction =>
-        transaction.product.toLowerCase().includes(searchTerm.toLowerCase())
+        transaction.product_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const formatDateTime = (datetime) => {
@@ -48,28 +44,63 @@ function Sales() {
         });
     };
 
-    const handleAddTransaction = (newTransaction) => {
-        const transactionWithId = {
-            ...newTransaction,
-            id: Date.now(),
-            transactionId: newTransaction.transactionId || ""
+    const handleAddTransaction = async (newTransaction) => {
+        // Transform frontend format to API format
+        const apiTransaction = {
+            payment_type: newTransaction.paymentMethod === "Gcash" ? "GCash" : newTransaction.paymentMethod,
+            payment_refstr: newTransaction.paymentMethod === "Gcash" ? newTransaction.transactionId : null,
+            transaction_items: [{
+                product_id: 1, // You'll need to map product name to ID
+                quantity_bought: newTransaction.quantity
+            }]
         };
-        const updatedTransactions = [...transactions, transactionWithId];
-        setTransactions(updatedTransactions);
-        localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
-        return true;
+        
+        try {
+            await addTransactionMutation.mutateAsync(apiTransaction);
+            alert("Transaction added successfully!");
+            return true;
+        } catch (error) {
+            console.error("Failed to add transaction:", error);
+            alert("Failed to add transaction. Please try again.");
+            return false;
+        }
     };
 
-    const handleEditTransaction = (updatedTransaction) => {
-        const updatedTransactions = transactions.map(transaction =>
-            transaction.id === updatedTransaction.id ? updatedTransaction : transaction
-        );
-        setTransactions(updatedTransactions);
-        localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
+    const handleEditTransaction = async (updatedTransaction) => {
+        const updateData = {
+            payment_type: updatedTransaction.paymentMethod === "Gcash" ? "GCash" : updatedTransaction.paymentMethod,
+            payment_refstr: updatedTransaction.paymentMethod === "Gcash" ? updatedTransaction.transactionId : null,
+            transaction_items: [{
+                product_id: updatedTransaction.productId || 1,
+                quantity_bought: updatedTransaction.quantity
+            }]
+        };
+        
+        try {
+            await updateTransactionMutation.mutateAsync({
+                transactionId: updatedTransaction.transaction_id,
+                updateData: updateData
+            });
+            return true;
+        } catch (error) {
+            console.error("Failed to update transaction:", error);
+            return false;
+        }
     };
 
     const openEditPopup = (transaction) => {
-        setSelectedTransaction(transaction);
+        // Transform to frontend format for editing
+        const frontendFormat = {
+            ...transaction,
+            id: transaction.transaction_id,
+            product: transaction.product_name,
+            datetime: transaction.transaction_timestamp?.slice(0, 16),
+            paymentMethod: transaction.payment_type === "GCash" ? "Gcash" : transaction.payment_type,
+            revenue: transaction.total_revenue,
+            quantity: transaction.quantity || 1,
+            transactionId: transaction.payment_refstr
+        };
+        setSelectedTransaction(frontendFormat);
         setshoweditsales(true);
     };
 
@@ -103,19 +134,19 @@ function Sales() {
                     </div>
                 ) : (
                     filteredTransactions.map((transaction) => (
-                        <div key={transaction.id} className={styles.tableRow}>
-                            <div className={styles.cell}>{transaction.product}</div>
-                            <div className={styles.cell}>{formatDateTime(transaction.datetime)}</div>
+                        <div key={transaction.transaction_id} className={styles.tableRow}>
+                            <div className={styles.cell}>{transaction.product_name}</div>
+                            <div className={styles.cell}>{formatDateTime(transaction.transaction_timestamp)}</div>
                             <div className={styles.cell}>
-                                <span className={styles.methodBadge}>{transaction.paymentMethod}</span>
-                                {transaction.paymentMethod === "Gcash" && transaction.transactionId && (
+                                <span className={styles.methodBadge}>{transaction.payment_type}</span>
+                                {transaction.payment_type === "GCash" && transaction.payment_refstr && (
                                     <div className={styles.transactionIdText}>
-                                        ID: {transaction.transactionId}
+                                        ID: {transaction.payment_refstr}
                                     </div>
                                 )}
                             </div>
                             <div className={`${styles.cell} ${styles.revenueValue}`}>
-                                ₱{transaction.revenue.toLocaleString()}
+                                ₱{transaction.total_revenue?.toLocaleString() || 0}
                             </div>
                             <div className={styles.cell}>
                                 <button 
@@ -142,11 +173,13 @@ function Sales() {
                         setSelectedTransaction(null);
                     }} 
                     transaction={selectedTransaction}
-                    onSave={(updatedData) => {
-                        const updatedTransaction = { ...selectedTransaction, ...updatedData };
-                        handleEditTransaction(updatedTransaction);
-                        alert("Transaction updated successfully!");
-                        return true;
+                    onSave={async (updatedData) => {
+                        const success = await handleEditTransaction(updatedData);
+                        if (success) {
+                            alert("Transaction updated successfully!");
+                            return true;
+                        }
+                        return false;
                     }}
                 />
             )}

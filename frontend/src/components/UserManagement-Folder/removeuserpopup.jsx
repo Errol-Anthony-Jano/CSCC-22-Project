@@ -1,13 +1,14 @@
 import styles from "./removeuserpopup.module.css";
 import Confirmation from "./confirmation";
 import { useState } from "react";
+import { useRemoveUser } from "../../hooks/useUsers";
 
 function RemoveUserPopup({ onClose, onUserRemoved, users = [] }) {
     const [showConfirm, setShowConfirm] = useState(false);
     const [username, setUsername] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
     const [foundUser, setFoundUser] = useState(null);
+    const removeUserMutation = useRemoveUser();
 
     const handleUsernameChange = (e) => {
         const value = e.target.value;
@@ -16,7 +17,7 @@ function RemoveUserPopup({ onClose, onUserRemoved, users = [] }) {
         
         // Auto-search as user types
         if (value.trim()) {
-            const user = users.find(u => u.username.toLowerCase() === value.toLowerCase());
+            const user = users.find(u => u.username?.toLowerCase() === value.toLowerCase());
             setFoundUser(user || null);
             if (!user) {
                 setError(`User "${value}" not found.`);
@@ -29,19 +30,18 @@ function RemoveUserPopup({ onClose, onUserRemoved, users = [] }) {
         }
     };
 
-    const handleArchive = () => {
-        return new Promise((resolve) => {
-            setLoading(true);
-            setTimeout(() => {
-                if (foundUser && onUserRemoved) {
-                    onUserRemoved(foundUser.username);
-                    resolve(true);
-                } else {
-                    resolve(false);
-                }
-                setLoading(false);
-            }, 500);
-        });
+    const handleArchive = async () => {
+        if (foundUser && onUserRemoved) {
+            try {
+                await removeUserMutation.mutateAsync(foundUser.id);
+                onUserRemoved(foundUser.username);
+                return true;
+            } catch (err) {
+                console.error(err);
+                return false;
+            }
+        }
+        return false;
     };
 
     const handleConfirmClick = () => {
@@ -51,7 +51,7 @@ function RemoveUserPopup({ onClose, onUserRemoved, users = [] }) {
             return;
         }
         
-        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+        const user = users.find(u => u.username?.toLowerCase() === username.toLowerCase());
         if (!user) {
             setError(`User "${username}" not found.`);
             return;
@@ -86,7 +86,7 @@ function RemoveUserPopup({ onClose, onUserRemoved, users = [] }) {
                         <p style={{ margin: "5px 0" }}><strong>Username:</strong> {foundUser.username}</p>
                         <p style={{ margin: "5px 0" }}><strong>Role:</strong> {foundUser.role}</p>
                         <p style={{ margin: "5px 0", fontSize: "12px", color: "#666" }}>
-                            <strong>Created:</strong> {foundUser.createdAt}
+                            <strong>Created:</strong> {foundUser.created_at || foundUser.createdAt}
                         </p>
                     </div>
                 )}
@@ -100,9 +100,9 @@ function RemoveUserPopup({ onClose, onUserRemoved, users = [] }) {
                 <button 
                     onClick={handleConfirmClick} 
                     className={styles.buttonpop}
-                    disabled={loading || !foundUser}
+                    disabled={removeUserMutation.isLoading || !foundUser}
                 >
-                    {loading ? "Processing..." : "Confirm Remove"}
+                    {removeUserMutation.isLoading ? "Removing..." : "Confirm Remove"}
                 </button>
                 <br />
                 <button onClick={onClose} className={styles.buttonpop}>Cancel</button>

@@ -67,7 +67,7 @@ function AddSales({ onClose, onAdd }) {
                     </div>
                 )}
                 
-                <h3>PRODUCT:*</h3>
+                <h3>PRODUCT:</h3>
                 <input 
                     type="text" 
                     name="product"
@@ -77,9 +77,9 @@ function AddSales({ onClose, onAdd }) {
                     onChange={handleChange}
                 />
                 
-                <h3>QUANTITY:*</h3>
+                <h3>QUANTITY:</h3>
                 <input 
-                    type="number" 
+                    type="number"
                     name="quantity"
                     placeholder="Enter Quantity" 
                     className={styles.input}
@@ -88,7 +88,7 @@ function AddSales({ onClose, onAdd }) {
                     min="1"
                 />
                 
-                <h3>DATE & TIME:*</h3>
+                <h3>DATE & TIME:</h3>
                 <input 
                     type="datetime-local" 
                     name="datetime"
@@ -97,7 +97,7 @@ function AddSales({ onClose, onAdd }) {
                     onChange={handleChange}
                 />
                 
-                <h3>PAYMENT METHOD:*</h3>
+                <h3>PAYMENT METHOD:</h3>
                 <select 
                     name="paymentMethod"
                     className={styles.paymentmethod}
@@ -114,7 +114,7 @@ function AddSales({ onClose, onAdd }) {
                 {/* Transaction ID field - only shows when GCash is selected */}
                 {formData.paymentMethod === "Gcash" && (
                     <>
-                        <h3>TRANSACTION ID:*</h3>
+                        <h3>TRANSACTION ID:</h3>
                         <input 
                             type="text" 
                             name="transactionId"
@@ -126,7 +126,7 @@ function AddSales({ onClose, onAdd }) {
                     </>
                 )}
                 
-                <h3>REVENUE:*</h3>
+                <h3>REVENUE:</h3>
                 <input 
                     type="number" 
                     name="revenue"
@@ -137,19 +137,18 @@ function AddSales({ onClose, onAdd }) {
                     min="0"
                     step="0.01"
                 />
-
+                <button 
+                    onClick={onClose} 
+                    className={styles.buttonpop}
+                >
+                    Cancel
+                </button>
                 <button 
                     className={styles.buttonpop} 
                     onClick={handleSubmit}
                     disabled={loading}
                 >
                     {loading ? "Adding..." : "Add Transaction"}
-                </button>
-                <button 
-                    onClick={onClose} 
-                    className={styles.buttonpop}
-                >
-                    Cancel
                 </button>
             </div>
         </div>
