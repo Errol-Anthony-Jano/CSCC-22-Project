@@ -84,3 +84,23 @@ export const carvePayload = async (req, res, next) => {
         return res.status(error.status || 500).json({ message: error.message });
     }
 }
+
+export const validateMonthAndYear = async (req, res, next) => {
+    try {
+        const { month, year } = req.query;
+        if (!month || !year) {
+            return res.status(400).json({ message: "Month and year query parameters are required." });
+        }
+        else if (isNaN(month) || month < 1 || month > 12) {
+            return res.status(400).json({ message: "Month must be a number between 1 and 12." });
+        }
+        else if (isNaN(year) || year < 1000 || year > 9999) {
+            return res.status(400).json({ message: "Year must be a 4-digit number." });
+        }
+
+        next();
+    }
+    catch (error) {
+        return res.status(error.status || 500).json({ message: error.message });
+    }
+}
