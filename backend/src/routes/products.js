@@ -2,7 +2,6 @@ import express from "express";
 export const productsRouter = express.Router();
 import models from "../config/db.js";
 import { Op } from "sequelize";
-import { validate } from "../middleware/productsMiddleware.js";
 import { validate, checkValidQuery } from "../middleware/productsMiddleware.js";
 import { insertNewProduct, updateExistingProduct } from "../controllers/productsController.js";
 import { insertProductSchema, updateProductSchema } from "../schemas/schemas.js";
