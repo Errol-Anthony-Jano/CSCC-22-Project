@@ -10,8 +10,8 @@ function EditAvailable({ product, onClose, onSave }) {
     const sanitizedPrice = price === "" ? product.price : `₱${price.replace(/[^\d]/g, "")}`;
 
     onSave({
-      quantity: updatedQuantity,
-      price: sanitizedPrice,
+      product_quantity: updatedQuantity,
+      product_unit_price: sanitizedPrice,
     });
   };
 
