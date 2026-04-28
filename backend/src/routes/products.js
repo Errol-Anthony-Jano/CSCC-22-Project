@@ -2,16 +2,9 @@ import express from "express";
 export const productsRouter = express.Router();
 import models from "../config/db.js";
 import { Op } from "sequelize";
-import { validateInsertPayload } from "../middleware/productsMiddleware.js";
-import { validatePatchPayload, checkValidQuery } from "../middleware/productsMiddleware.js";
+import { validate, checkValidQuery } from "../middleware/productsMiddleware.js";
 import { insertNewProduct, updateExistingProduct } from "../controllers/productsController.js";
-
-const productsSchema = {
-  product_name: "string",
-  product_unit_price: "number",
-  product_quantity: "number",
-  is_still_offered: "boolean"
-}
+import { insertProductSchema, updateProductSchema } from "../schemas/schemas.js";
 
 // -> get all products
 productsRouter.get('/', async (req, res) => {
@@ -38,7 +31,7 @@ productsRouter.get('/search', checkValidQuery(), async (req, res) => {
 })
 
 // -> add new product
-productsRouter.post('/', validateInsertPayload(productsSchema), insertNewProduct)
+productsRouter.post('/', validate(insertProductSchema), insertNewProduct)
 
 // update any of the product details (except for product_id)
-productsRouter.patch('/:productId', validatePatchPayload(productsSchema), updateExistingProduct);
+productsRouter.patch('/:productId', validate(updateProductSchema), updateExistingProduct);
