@@ -13,8 +13,8 @@ export const useProducts = () => {
 
     // The Updater (Mutation)
     const updateMutation = useMutation({
-        mutationFn: async (updatedProduct) => {
-            return api.patch(`/products/${updatedProduct.product_id}`, updatedProduct);
+        mutationFn: async ({ product_id, ...payload }) => {
+            return api.patch(`/products/${product_id}`, payload);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['products'] });
