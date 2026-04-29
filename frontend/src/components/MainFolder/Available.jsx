@@ -35,7 +35,6 @@ const Available = () => {
   };
 
   const saveProduct = (updatedValues) => {
-    console.log(updatedValues);
     updateMutation.mutate({ product_id: selectedProduct.product_id, ...updatedValues });
     closeEdit();
   };
